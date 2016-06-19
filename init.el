@@ -1,3 +1,5 @@
+;; refs. https://github.com/whatyouhide/emacs.d
+
 ;; Initialize the package system.
 (when (< emacs-major-version 23)
   (defvar user-emacs-directory "~/.emacs.d/"))
@@ -229,6 +231,9 @@
 
 (use-package my-osx
   :if (eq system-type 'darwin))
+
+(use-package my-windows
+  :if (eq system-type 'windows-nt))
 
 (use-package my-configs)
 
