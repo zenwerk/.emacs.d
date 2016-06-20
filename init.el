@@ -106,7 +106,10 @@
     (global-evil-leader-mode)
     (evil-leader/set-leader "\\"))
   :config
-  (evil-mode 1))
+  (evil-mode 1)
+  ;; Modes that don't use evil.
+  (setq evil-emacs-state-modes (append evil-emacs-state-modes
+                                         '(alchemist-iex-mode))))
 
 ;; evil-visualstar-mode
 (use-package evil-visualstar
