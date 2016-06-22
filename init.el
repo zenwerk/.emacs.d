@@ -668,6 +668,17 @@
   :load-path "~/Code/emacs-elixir"
   :mode ("\\.ex\\'" "\\.exs\\'" "mix\\.lock\\'")
   :config
+  (use-package flycheck-elixir)
+  ;; for elixir do-end
+  (use-package ruby-end
+    :config
+    (add-to-list 'elixir-mode-hook
+                 (defun auto-activate-ruby-end-mode-for-elixir-mode ()
+                   (set (make-variable-buffer-local 'ruby-end-expand-keywords-before-re)
+                        "\\(?:^\\|\\s-+\\)\\(?:do\\)")
+                   (set (make-variable-buffer-local 'ruby-end-check-statement-modifiers) nil)
+                   (ruby-end-mode +1)
+                   )))
   (use-package alchemist
     :load-path "~/Code/alchemist.el"
     :diminish alchemist-mode

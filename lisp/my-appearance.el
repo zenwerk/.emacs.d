@@ -14,9 +14,9 @@
 ;; Don't flash any alarms.
 (setq ring-bell-function 'ignore)
 
-;; Hide all the intrusive GUI features.
+;; Hide all the intrusive GUI features without menu-bar+w.
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
-(menu-bar-mode -1)
+(menu-bar-mode 1)
 
 (provide 'my-appearance)
