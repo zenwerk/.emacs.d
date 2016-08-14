@@ -83,7 +83,7 @@
 ;; Global keyboarding
 
 (global-set-key (kbd "<f8>") 'my/edit-init-file)
-(global-set-key (kbd "C-x \\") 'my/split-window-horizontally-and-focus-new)
+(global-set-key (kbd "C-x %") 'my/split-window-horizontally-and-focus-new)
 (global-set-key (kbd "C-x -") 'my/split-window-vertically-and-focus-new)
 (global-set-key (kbd "C-x p") (lambda () (interactive) (other-window -1)))
 (global-set-key (kbd "C-x O") 'other-frame)
@@ -109,7 +109,17 @@
   (evil-mode 1)
   ;; Modes that don't use evil.
   (setq evil-emacs-state-modes (append evil-emacs-state-modes
-                                         '(alchemist-iex-mode))))
+                                       '(alchemist-iex-mode)))
+  ;; j,k で物理行移動, gj,gk で論理行移動
+  (defun evil-swap-key (map key1 key2)
+    ;; MAP中のKEY1とKEY2を入れ替え
+    "Swap KEY1 and KEY2 in MAP."
+    (let ((def1 (lookup-key map key1))
+          (def2 (lookup-key map key2)))
+      (define-key map key1 def2)
+      (define-key map key2 def1)))
+  (evil-swap-key evil-motion-state-map "j" "gj")
+  (evil-swap-key evil-motion-state-map "k" "gk"))
 
 ;; evil-visualstar-mode
 (use-package evil-visualstar
@@ -132,7 +142,7 @@
 
 (use-package evil-nerd-commenter
   :config
-  (global-set-key (kbd "M-;") 'evilnc-comment-or-uncomment-lines)
+  (global-set-key (kbd "s-/") 'evilnc-comment-or-uncomment-lines)
   (global-set-key (kbd "C-c l") 'evilnc-quick-comment-or-uncomment-to-the-line)
   (global-set-key (kbd "C-c c") 'evilnc-copy-and-comment-lines)
   (global-set-key (kbd "C-c p") 'evilnc-comment-or-uncomment-paragraphs)
@@ -413,25 +423,6 @@
 
 ;; Helm-related things.
 
-;(use-package helm
-;  :ensure t
-;  :diminish helm-mode
-;  :bind (("M-x" . helm-M-x)
-;         ("C-x C-f" . helm-find-files)
-;         ("C-x b" . helm-buffers-list))
-;  :init
-;  (setq helm-M-x-fuzzy-match t
-;        helm-buffers-fuzzy-matching t
-;        helm-display-header-line nil)
-;  (evil-leader/set-key "<SPC>" 'helm-M-x)
-;  :config
-;  ;; No idea why here find-file is set to nil (so it uses the native find-file
-;  ;; for Emacs. This makes stuff like (find-file (read-file-name ...)) work with
-;  ;; Helm again.
-;  (helm-mode 1)
-;  (helm-autoresize-mode 1)
-;  (add-to-list 'helm-completing-read-handlers-alist '(find-file . helm-completing-read-symbols)))
-
 (use-package helm
   :ensure t
   :diminish helm-mode
@@ -470,6 +461,37 @@
 ;  :ensure t
 ;  :bind ("C-;" . avy-goto-char))
 
+(use-package ggtags
+  :init
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
+                (ggtags-mode 1))))
+  (add-hook 'clojure-mode-hook (lambda () (ggtags-mode 1)))
+  (add-hook 'elixir-mode-hook (lambda () (ggtags-mode 1)))
+  (add-hook 'erlang-mode-hook (lambda () (ggtags-mode 1)))
+
+  :config
+  ;; use helm
+  (setq ggtags-completing-read-function nil)
+
+  ;; use eldoc
+  (setq-local eldoc-documentation-function #'ggtags-eldoc-function)
+
+  ;; imenu
+  (setq-local imenu-create-index-function #'ggtags-build-imenu-index)
+
+  (define-key ggtags-mode-map (kbd "s-b") 'ggtags-find-definition)
+  (define-key ggtags-mode-map (kbd "C-c g s") 'ggtags-find-other-symbol)
+  (define-key ggtags-mode-map (kbd "C-c g h") 'ggtags-view-tag-history)
+  (define-key ggtags-mode-map (kbd "C-c g r") 'ggtags-find-reference)
+  (define-key ggtags-mode-map (kbd "C-c g f") 'ggtags-find-file)
+  (define-key ggtags-mode-map (kbd "C-c g c") 'ggtags-create-tags)
+  (define-key ggtags-mode-map (kbd "C-c g u") 'ggtags-update-tags)
+  (define-key ggtags-mode-map (kbd "C-c g m") 'ggtags-find-tag-dwim)
+
+  (define-key ggtags-mode-map (kbd "M-,") 'pop-tag-mark))
+
 (use-package projectile
   :ensure t
   :commands (projectile-find-file projectile-switch-project)
@@ -482,7 +504,41 @@
     "f" 'helm-projectile-find-file
     "T" 'my/projectile-open-todo)
   :config
+  (when (executable-find "gtags")
+    (setq projectile-tags-file-name "GTAGS")
+    (setq projectile-tags-command "gtags  --gtagslabel=pygments"))
   (projectile-global-mode))
+
+;; ;;; ctags
+;; ;; http://thegreata.pe/setting-up-evil-mode-friendly-ctags-in-emacs
+;; (defun regenerate-tags ()
+;;   (interactive)
+;;   (let ((tags-directory (directory-file-name (projectile-project-root))))
+;;     (shell-command
+;;      (format "ctags -f %s -e -R %s" "tags" tags-directory))))
+
+;; (use-package ctags-update
+;;   :ensure t
+;;   :config
+;;   (progn
+;;     (add-hook 'elixir-mode-hook 'turn-on-ctags-auto-update-mode)))
+
+;; (define-key evil-normal-state-map (kbd "gf")
+;;   (lambda () (interactive) (find-tag (find-tag-default-as-regexp))))
+
+;; (define-key evil-normal-state-map (kbd "gb") 'pop-tag-mark)
+
+;; (define-key evil-normal-state-map (kbd "gn")
+;;   (lambda () (interactive) (find-tag last-tag t)))
+
+;; (evil-leader/set-key "y" 'helm-etags-select)
+
+;; (defun my-etags-sort-function (candidates source)
+;;   (sort candidates (lambda (a b) (< (length a) (length b)))))
+
+;; (defmethod helm-setup-user-source ((source helm-source))
+;;   (when (equal (oref source :name) "Etags")
+;;     (oset source :filtered-candidate-transformer 'my-etags-sort-function)))
 
 (use-package flyspell
   ;; built-in
@@ -533,7 +589,7 @@
     (define-key company-active-map (kbd "C-p") 'company-select-previous)
     (define-key company-active-map (kbd "TAB") 'company-complete-selection)
     (define-key company-active-map (kbd "<tab>") 'company-complete-selection)
-    (define-key company-active-map (kbd "RET") nil)
+    (define-key company-active-map (kbd "RET") 'company-complete-selection)
     (global-company-mode t)))
 
 (use-package yasnippet
