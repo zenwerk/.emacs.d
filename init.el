@@ -295,8 +295,8 @@
 
 (use-package neotree
   :config
-  (evil-leader/set-key
-  "n" 'neotree-toggle)
+  (evil-leader/set-key "n" 'neotree-toggle)
+  (evil-leader/set-key "m" 'neotree-projectile-action)
   ;; 隠しファイルをデフォルトで表示
   (setq neo-show-hidden-files t)
   ;; neotree でファイルを新規作成した後、自動的にファイルを開く
@@ -508,37 +508,6 @@
     (setq projectile-tags-file-name "GTAGS")
     (setq projectile-tags-command "gtags  --gtagslabel=pygments"))
   (projectile-global-mode))
-
-;; ;;; ctags
-;; ;; http://thegreata.pe/setting-up-evil-mode-friendly-ctags-in-emacs
-;; (defun regenerate-tags ()
-;;   (interactive)
-;;   (let ((tags-directory (directory-file-name (projectile-project-root))))
-;;     (shell-command
-;;      (format "ctags -f %s -e -R %s" "tags" tags-directory))))
-
-;; (use-package ctags-update
-;;   :ensure t
-;;   :config
-;;   (progn
-;;     (add-hook 'elixir-mode-hook 'turn-on-ctags-auto-update-mode)))
-
-;; (define-key evil-normal-state-map (kbd "gf")
-;;   (lambda () (interactive) (find-tag (find-tag-default-as-regexp))))
-
-;; (define-key evil-normal-state-map (kbd "gb") 'pop-tag-mark)
-
-;; (define-key evil-normal-state-map (kbd "gn")
-;;   (lambda () (interactive) (find-tag last-tag t)))
-
-;; (evil-leader/set-key "y" 'helm-etags-select)
-
-;; (defun my-etags-sort-function (candidates source)
-;;   (sort candidates (lambda (a b) (< (length a) (length b)))))
-
-;; (defmethod helm-setup-user-source ((source helm-source))
-;;   (when (equal (oref source :name) "Etags")
-;;     (oset source :filtered-candidate-transformer 'my-etags-sort-function)))
 
 (use-package flyspell
   ;; built-in
