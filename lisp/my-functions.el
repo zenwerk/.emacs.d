@@ -79,7 +79,7 @@ line and the script will be made executable for the user."
   (let ((file (concat (projectile-project-root) "TODO.md")))
     (if (file-exists-p file)
         (find-file file)
-      (myen (y-or-n-p "TODO.md does not exist. Create one?")
+      (when (y-or-n-p "TODO.md does not exist. Create one?")
         (find-file file)))))
 
 (defun my/alchemist-new-exs-buffer ()

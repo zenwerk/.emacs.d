@@ -482,9 +482,9 @@
   (setq-local imenu-create-index-function #'ggtags-build-imenu-index)
 
   (define-key ggtags-mode-map (kbd "s-b") 'ggtags-find-definition)
+  (define-key ggtags-mode-map (kbd "s-r") 'ggtags-find-reference)
   (define-key ggtags-mode-map (kbd "C-c g s") 'ggtags-find-other-symbol)
   (define-key ggtags-mode-map (kbd "C-c g h") 'ggtags-view-tag-history)
-  (define-key ggtags-mode-map (kbd "C-c g r") 'ggtags-find-reference)
   (define-key ggtags-mode-map (kbd "C-c g f") 'ggtags-find-file)
   (define-key ggtags-mode-map (kbd "C-c g c") 'ggtags-create-tags)
   (define-key ggtags-mode-map (kbd "C-c g u") 'ggtags-update-tags)
@@ -504,10 +504,17 @@
     "f" 'helm-projectile-find-file
     "T" 'my/projectile-open-todo)
   :config
+  (projectile-global-mode)
   (when (executable-find "gtags")
+    ;; gtags の再生成コマンド
     (setq projectile-tags-file-name "GTAGS")
-    (setq projectile-tags-command "gtags  --gtagslabel=pygments"))
-  (projectile-global-mode))
+    (setq projectile-tags-command "gtags --gtagslabel=pygments")
+    (defun regenerate-tags ()
+      (interactive)
+      (let ((tags-directory (directory-file-name (projectile-project-root))))
+        (async-shell-command
+         (format "gtags --gtagslabel=pygments --debug" tags-file-name tags-directory))))
+    ))
 
 (use-package flyspell
   ;; built-in
@@ -628,7 +635,7 @@
 ;(use-package beacon
 ;  :ensure t
 ;  :defer 2
-;  :config
+ ;  :config
 ;  (beacon-mode 1))
 
 (use-package hl-todo
