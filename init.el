@@ -118,6 +118,7 @@
 ;; Evil.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package evil
+  :ensure t
   :config
   (evil-mode 1)
   ;; Modes that don't use evil.
@@ -136,6 +137,7 @@
 
   ;; evil-leader-mode
 (use-package evil-leader
+  :ensure t
   :config
   (setq evil-leader/in-all-status 1)
   (global-evil-leader-mode)
@@ -143,17 +145,20 @@
 
 ;; evil-visualstar-mode
 (use-package evil-visualstar
+  :ensure t
   :config
-  ;(evil-visualstar/persistant 1)
+  (evil-visualstar/persistant 1)
   (global-evil-visualstar-mode 1))
 
 ;; evil-soround
 (use-package evil-surround
+  :ensure t
   :config
   (global-evil-surround-mode 1))
 
 ;; evil-matchit
 (use-package evil-matchit
+  :ensure t
   :config
   (global-evil-matchit-mode 1))
 
@@ -161,6 +166,7 @@
 ;; Emacs key bindings
 
 (use-package evil-nerd-commenter
+  :ensure t
   :config
   (global-set-key (kbd "s-/") 'evilnc-comment-or-uncomment-lines)
   (global-set-key (kbd "C-c l") 'evilnc-quick-comment-or-uncomment-to-the-line)
@@ -174,13 +180,13 @@
     "cc" 'evilnc-copy-and-comment-lines
     "cp" 'evilnc-comment-or-uncomment-paragraphs
     "cr" 'comment-or-uncomment-region
-    "cv" 'evilnc-toggle-invert-comment-line-by-line
-    "\\" 'evilnc-comment-operator ; if you prefer backslash key
-  ))
+    "cv" 'evilnc-toggle-invert-comment-line-by-line))
+    ;"\\" 'evilnc-comment-operator ; if you prefer backslash key
 
 ;; evil-search-highlight-persist
 ;;(require 'highlight)
 (use-package evil-search-highlight-persist
+  :ensure t
   :config
   (global-evil-search-highlight-persist t))
 
@@ -316,6 +322,7 @@
   (neo-buffer--refresh t))
 
 (use-package neotree
+  :ensure t
   :config
   (evil-leader/set-key "n" 'neotree-toggle)
   (evil-leader/set-key "m" 'neotree-projectile-action)
@@ -711,6 +718,7 @@
   (setq erlang-indent-level 4))
 
 (use-package elixir-mode
+  :ensure t
   :load-path "~/Code/emacs-elixir"
   :mode ("\\.ex\\'" "\\.exs\\'" "mix\\.lock\\'")
   :config
@@ -726,6 +734,7 @@
                    (ruby-end-mode +1)
                    )))
   (use-package alchemist
+    :ensure t
     :load-path "~/Code/alchemist.el"
     :diminish alchemist-mode
     :init
@@ -758,11 +767,13 @@
 ;; Clojure and Related things
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package clojure-mode
+  :ensure t
   :init
   (add-hook 'clojure-mode-hook #'yas-minor-mode)
   (add-hook 'clojure-mode-hook #'subword-mode))
 
 (use-package cider
+  :ensure t
   :init
   (add-hook 'cider-mode-hook #'clj-refactor-mode)
   (add-hook 'cider-mode-hook #'company-mode)
@@ -797,6 +808,7 @@
 (use-package cider-eval-sexp-fu)
 
 (use-package clj-refactor
+  :ensure t
   :diminish clj-refactor-mode
   :config (cljr-add-keybindings-with-prefix "C-c j"))
 
