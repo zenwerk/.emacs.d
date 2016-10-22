@@ -147,7 +147,7 @@
 (use-package evil-visualstar
   :ensure t
   :config
-  (evil-visualstar/persistant 1)
+  ;(evil-visualstar/persistant 1)
   (global-evil-visualstar-mode 1))
 
 ;; evil-soround
@@ -778,7 +778,6 @@
   (add-hook 'cider-mode-hook #'clj-refactor-mode)
   (add-hook 'cider-mode-hook #'company-mode)
   (add-hook 'cider-repl-mode-hook #'company-mode)
-  (add-hook 'cider-repl-mode-hook #'my/lisp-mode-hook)
   :diminish subword-mode
   :config
   (setq nrepl-log-messages t
