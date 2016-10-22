@@ -10,30 +10,17 @@
 (setq package-enable-at-startup nil)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/") t)
-(package-initialize)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Bootstrap `use-package'.
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
+(package-initialize)
 
 ;; Add custom code to the load path. `ext' contains Lisp code that I didn't
 ;; write but that is not in melpa, while `lisp' is for List code I wrote.
 (add-to-list 'load-path (expand-file-name "ext" user-emacs-directory))
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 
-;; Make use-package available.
-(require 'use-package)
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; global settings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Functions that will be used also throughout this file.
-(use-package my-functions)
-
 ;; C-h をバックスペースにする (?\C-? は DEL のシーケンス)
 (keyboard-translate ?\C-h ?\C-?)
 
@@ -58,6 +45,42 @@
 ;; タブ幅の設定
 (setq-default tab-width 4)
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Global keyboarding
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(global-set-key (kbd "<f8>") 'my/edit-init-file)
+(global-set-key (kbd "C-x %") 'my/split-window-horizontally-and-focus-new)
+(global-set-key (kbd "C-x -") 'my/split-window-vertically-and-focus-new)
+(global-set-key (kbd "C-x p") (lambda () (interactive) (other-window -1)))
+(global-set-key (kbd "C-x O") 'other-frame)
+(global-set-key (kbd "C-x B") 'my/switch-to-previous-buffer)
+(global-set-key (kbd "C-k") 'kill-whole-line)
+
+;; Always as "y or n", not that annoying "yes or no".
+(defalias 'yes-or-no-p 'y-or-n-p)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Bootstrap `use-package'.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+;; Make use-package available.
+(require 'use-package)
+
+(use-package exec-path-from-shell
+  :ensure t
+  :if (memq window-system '(mac ns))
+  :config
+  (progn
+    (setq exec-path-from-shell-arguments '("-l"))
+    (exec-path-from-shell-initialize)))
+
+;; Functions that will be used also throughout this file.
+(use-package my-functions)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Theming
@@ -92,31 +115,9 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Global keyboarding
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(global-set-key (kbd "<f8>") 'my/edit-init-file)
-(global-set-key (kbd "C-x %") 'my/split-window-horizontally-and-focus-new)
-(global-set-key (kbd "C-x -") 'my/split-window-vertically-and-focus-new)
-(global-set-key (kbd "C-x p") (lambda () (interactive) (other-window -1)))
-(global-set-key (kbd "C-x O") 'other-frame)
-(global-set-key (kbd "C-x B") 'my/switch-to-previous-buffer)
-(global-set-key (kbd "C-k") 'kill-whole-line)
-
-;; Always as "y or n", not that annoying "yes or no".
-(defalias 'yes-or-no-p 'y-or-n-p)
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Evil.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package evil
-  :init
-  ;; evil-leader-mode
-  (use-package evil-leader
-    :config
-    (setq evil-leader/in-all-status 1)
-    (global-evil-leader-mode)
-    (evil-leader/set-leader "\\"))
   :config
   (evil-mode 1)
   ;; Modes that don't use evil.
@@ -132,6 +133,13 @@
       (define-key map key2 def1)))
   (evil-swap-key evil-motion-state-map "j" "gj")
   (evil-swap-key evil-motion-state-map "k" "gk"))
+
+  ;; evil-leader-mode
+(use-package evil-leader
+  :config
+  (setq evil-leader/in-all-status 1)
+  (global-evil-leader-mode)
+  (evil-leader/set-leader "\\"))
 
 ;; evil-visualstar-mode
 (use-package evil-visualstar
@@ -604,14 +612,6 @@
 ;  (add-to-list 'writeroom-global-effects 'my/toggle-tmux-status-bar))
 
 ;; Correctly load $PATH and $MANPATH on OSX (GUI).
-(use-package exec-path-from-shell
-  :ensure t
-  :if (memq window-system '(mac ns))
-  :config
-  (progn
-    (setq exec-path-from-shell-arguments '("-l"))
-    (exec-path-from-shell-initialize)))
-
 ;(use-package reveal-in-osx-finder
 ;  :ensure t
 ;  :if (eq system-type 'darwin))
