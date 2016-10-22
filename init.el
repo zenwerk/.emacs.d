@@ -1,6 +1,8 @@
 ;; refs. https://github.com/whatyouhide/emacs.d
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Initialize the package system.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (when (< emacs-major-version 23)
   (defvar user-emacs-directory "~/.emacs.d/"))
 
@@ -10,7 +12,9 @@
 (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/") t)
 (package-initialize)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Bootstrap `use-package'.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
@@ -23,6 +27,10 @@
 ;; Make use-package available.
 (require 'use-package)
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; global settings
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Functions that will be used also throughout this file.
 (use-package my-functions)
 
@@ -51,7 +59,9 @@
 (setq-default tab-width 4)
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Theming
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package badwolf-theme      :ensure t :defer t)
 (use-package darktooth-theme    :ensure t :defer t)
 (use-package material-theme     :ensure t :defer t)
@@ -80,8 +90,10 @@
       (my/theming-load-random-theme)
     (load-theme my/term-theme t)))
 
-;; Global keyboarding
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Global keyboarding
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (global-set-key (kbd "<f8>") 'my/edit-init-file)
 (global-set-key (kbd "C-x %") 'my/split-window-horizontally-and-focus-new)
 (global-set-key (kbd "C-x -") 'my/split-window-vertically-and-focus-new)
@@ -94,8 +106,8 @@
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Evil.
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package evil
   :init
@@ -163,9 +175,8 @@
 (use-package evil-search-highlight-persist
   :config
   (global-evil-search-highlight-persist t))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
 ;(use-package evil
 ;  :ensure t
 ;  :init
@@ -232,8 +243,10 @@
 ;    (global-evil-surround-mode 1)
 ;    (evil-define-key 'visual evil-surround-mode-map "s" 'evil-surround-region)))
 
-;; My stuff.
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; My stuff.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package my-tmux
   :if (not (window-system)))
 
@@ -282,8 +295,9 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; NeoTree
-;(require 'dired)
 ;; https://github.com/andrewmcveigh/emacs.d/blob/master/lisp/init-neotree.el
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; (require 'dired)
 (defun neotree-copy-file ()
   (interactive)
   (let* ((current-path (neo-buffer--get-filename-current-line))
@@ -357,8 +371,9 @@
     (diminish 'undo-tree-mode)
     (diminish 'evil-commentary-mode)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Git-related things.
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;(use-package magit
 ;  :ensure t
 ;  :commands (magit-status magit-checkout)
@@ -421,8 +436,9 @@
   :init
   (evil-leader/set-key "g b" 'browse-at-remote/browse))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Helm-related things.
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package helm
   :ensure t
   :diminish helm-mode
@@ -620,11 +636,6 @@
 ;  :config
 ;  (drag-stuff-global-mode))
 
-(use-package rainbow-delimiters
-  :ensure t
-  :init
-  (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode))
-
 ;(use-package default-text-scale
 ;  :ensure t
 ;  :bind (("s-=" . default-text-scale-increase)
@@ -672,10 +683,10 @@
         web-mode-css-indent-offset 2
         web-mode-code-indent-offset 2))
 
-;(use-package js
-;  ;; built-in
-;  :init
-;  (setq js-indent-level 2))
+(use-package js
+  ;; built-in
+  :init
+  (setq js-indent-level 2))
 
 ;(use-package scss-mode
 ;  :ensure t
@@ -683,6 +694,9 @@
 ;  :init
 ;  (setq css-indent-offset 2))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Erlang / Elixir
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package erlang
   :ensure t
   ;; We need to specify erlang-mode explicitely as the package is not called
@@ -740,9 +754,72 @@
         "e b" 'alchemist-eval-buffer
         "a d" 'alchemist-goto-list-symbol-definitions))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Clojure and Related things
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package clojure-mode
+  :init
+  (add-hook 'clojure-mode-hook #'yas-minor-mode)
+  (add-hook 'clojure-mode-hook #'subword-mode))
+
+(use-package cider
+  :init
+  (add-hook 'cider-mode-hook #'clj-refactor-mode)
+  (add-hook 'cider-mode-hook #'company-mode)
+  (add-hook 'cider-repl-mode-hook #'company-mode)
+  (add-hook 'cider-repl-mode-hook #'my/lisp-mode-hook)
+  :diminish subword-mode
+  :config
+  (setq nrepl-log-messages t
+        cider-repl-display-in-current-window t
+        cider-repl-use-clojure-font-lock t
+        cider-prompt-save-file-on-load 'always-save
+        cider-font-lock-dynamically '(macro core function var)
+        cider-overlays-use-font-lock t)
+  (cider-repl-toggle-pretty-printing))
+
+(use-package parinfer
+  :ensure t
+  :bind
+  (("C-," . parinfer-toggle-mode))
+  :init
+  (progn
+    (setq parinfer-extensions
+          '(defaults       ; should be included.
+            pretty-parens  ; different paren styles for different modes.
+            evil           ; If you use Evil.
+            ;lispy          ; If you use Lispy. With this extension, you should install Lispy and do not enable lispy-mode directly.
+            smart-tab      ; C-b & C-f jump positions and smart shift with tab & S-tab.
+            smart-yank))   ; Yank behavior depend on mode.
+    (add-hook 'clojure-mode-hook #'parinfer-mode)
+    (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)))
+
+(use-package cider-eval-sexp-fu)
+
+(use-package clj-refactor
+  :diminish clj-refactor-mode
+  :config (cljr-add-keybindings-with-prefix "C-c j"))
+
+(use-package rainbow-delimiters
+  :ensure t
+  :init
+  (add-hook 'emacs-clojure-hook 'rainbow-delimiters-mode)
+  (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode))
+
+
 (use-package markdown-mode
   :ensure t
   :mode ("\\.md\\'" "\\.mkd\\'" "\\.markdown\\'"))
+
+(use-package yaml-mode
+  :ensure t
+  :mode "\\.e?ya?ml$")
+
+(use-package org-mode
+  :mode "\\.org\\'"
+  :config
+  (setq org-blank-before-new-entry '((heading . t)
+                                     (plain-list-item . auto))))
 
 ;(use-package ruby-mode
 ;  ;; built-in
@@ -761,15 +838,11 @@
 ;  :init
 ;  (setq rbenv-installation-dir "/usr/local/Cellar/rbenv/0.4.0"))
 
-(use-package projectile-rails
-  :ensure t
-  :defer t
-  :init
-  (add-hook 'projectile-mode-hook 'projectile-rails-on))
-
-(use-package yaml-mode
-  :ensure t
-  :mode "\\.e?ya?ml$")
+;(use-package projectile-rails
+;  :ensure t
+;  :defer t
+;  :init
+;  (add-hook 'projectile-mode-hook 'projectile-rails-on))
 
 ;(use-package sh-script
 ;  ;; built-in
@@ -807,12 +880,6 @@
 ;              (setq-local tab-width 4)
 ;              (setq gofmt-command "goimports")
 ;              (add-hook 'before-save-hook 'gofmt-before-save))))
-
-(use-package org-mode
-  :mode "\\.org\\'"
-  :config
-  (setq org-blank-before-new-entry '((heading . t)
-                                     (plain-list-item . auto))))
 
 
 ;; Only maximize the window now because doing so earlier causes weird
