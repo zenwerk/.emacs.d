@@ -45,6 +45,8 @@
 ;; タブ幅の設定
 (setq-default tab-width 4)
 
+;; ミニバッファで C-w で単語区切りで削除
+(define-key minibuffer-local-completion-map (kbd "C-w") 'backward-kill-word)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Global keyboarding
@@ -164,7 +166,6 @@
 
 ;; evil-nerd-commenter
 ;; Emacs key bindings
-
 (use-package evil-nerd-commenter
   :ensure t
   :config
@@ -188,6 +189,8 @@
 (use-package evil-search-highlight-persist
   :ensure t
   :config
+  ; escape でハイライトを消す
+  (define-key evil-normal-state-map [escape] 'evil-search-highlight-persist-remove-all)
   (global-evil-search-highlight-persist t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -386,6 +389,20 @@
     (diminish 'undo-tree-mode)
     (diminish 'evil-commentary-mode)))
 
+(use-package zlc
+  :ensure t
+  :config
+  (zlc-mode t)
+  (let ((map minibuffer-local-map))
+    ;; like menu select
+    (define-key map (kbd "C-n")  'zlc-select-next-vertical)
+    (define-key map (kbd "C-p")    'zlc-select-previous-vertical)
+    (define-key map (kbd "C-f") 'zlc-select-next)
+    (define-key map (kbd "C-b")  'zlc-select-previous)
+
+    ;; reset selection
+    (define-key map (kbd "C-c") 'zlc-reset)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Git-related things.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -470,7 +487,7 @@
   ;; Helm again.
   (helm-mode 1)
   (helm-autoresize-mode 1)
-  (add-to-list 'helm-completing-read-handlers-alist '(find-file . helm-completing-read-symbols)))
+  (add-to-list 'helm-completing-read-handlers-alist '(find-file . nil)))
 
 (use-package helm-ag
   :ensure t
@@ -653,7 +670,7 @@
 ;(use-package beacon
 ;  :ensure t
 ;  :defer 2
- ;  :config
+;  :config
 ;  (beacon-mode 1))
 
 (use-package hl-todo
@@ -661,10 +678,6 @@
   :defer 1
   :config
   (global-hl-todo-mode))
-
-;(use-package xkcd
-;  :ensure t
-;  :commands xkcd)
 
 ;(use-package perspective
 ;  :ensure t
@@ -788,21 +801,21 @@
         cider-overlays-use-font-lock t)
   (cider-repl-toggle-pretty-printing))
 
-(use-package parinfer
-  :ensure t
-  :bind
-  (("C-," . parinfer-toggle-mode))
-  :init
-  (progn
-    (setq parinfer-extensions
-          '(defaults       ; should be included.
-            pretty-parens  ; different paren styles for different modes.
-            evil           ; If you use Evil.
-            ;lispy          ; If you use Lispy. With this extension, you should install Lispy and do not enable lispy-mode directly.
-            smart-tab      ; C-b & C-f jump positions and smart shift with tab & S-tab.
-            smart-yank))   ; Yank behavior depend on mode.
-    (add-hook 'clojure-mode-hook #'parinfer-mode)
-    (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)))
+; (use-package parinfer
+;   :ensure t
+;   :bind
+;   (("C-," . parinfer-toggle-mode))
+;   :init
+;   (progn
+;     (setq parinfer-extensions
+;           '(defaults       ; should be included.
+;             pretty-parens  ; different paren styles for different modes.
+;             evil           ; If you use Evil.
+;             ;lispy          ; If you use Lispy. With this extension, you should install Lispy and do not enable lispy-mode directly.
+;             smart-tab      ; C-b & C-f jump positions and smart shift with tab & S-tab.
+;             smart-yank))   ; Yank behavior depend on mode.
+;     (add-hook 'clojure-mode-hook #'parinfer-mode)
+;     (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)))
 
 (use-package cider-eval-sexp-fu)
 
