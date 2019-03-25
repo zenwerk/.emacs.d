@@ -8,8 +8,8 @@
 
 (require 'package)
 (setq package-enable-at-startup nil)
-(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
-(add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/") t)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
 
 (package-initialize)
 
@@ -54,10 +54,10 @@
 (global-set-key (kbd "<f8>") 'my/edit-init-file)
 (global-set-key (kbd "C-x %") 'my/split-window-horizontally-and-focus-new)
 (global-set-key (kbd "C-x -") 'my/split-window-vertically-and-focus-new)
-(global-set-key (kbd "C-x p") (lambda () (interactive) (other-window -1)))
-(global-set-key (kbd "C-x O") 'other-frame)
-(global-set-key (kbd "C-x B") 'my/switch-to-previous-buffer)
-(global-set-key (kbd "C-k") 'kill-whole-line)
+;(global-set-key (kbd "C-x p") (lambda () (interactive) (other-window -1)))
+;(global-set-key (kbd "C-x O") 'other-frame)
+;(global-set-key (kbd "C-x B") 'my/switch-to-previous-buffer)
+;(global-set-key (kbd "C-k") 'kill-whole-line)
 
 ;; Always as "y or n", not that annoying "yes or no".
 (defalias 'yes-or-no-p 'y-or-n-p)
@@ -82,38 +82,31 @@
     (exec-path-from-shell-initialize)))
 
 ;; Functions that will be used also throughout this file.
-(use-package my-functions)
+;(use-package my-functions)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Theming
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package badwolf-theme      :ensure t :defer t)
-(use-package darktooth-theme    :ensure t :defer t)
-(use-package material-theme     :ensure t :defer t)
-(use-package monokai-theme      :ensure t :defer t)
-(use-package mustang-theme      :ensure t :defer t)
-(use-package solarized-theme    :ensure t :defer t)
-(use-package zenburn-theme      :ensure t :defer t)
+;(use-package badwolf-theme      :ensure t :defer t)
+;(use-package material-theme     :ensure t :defer t)
+;(use-package mustang-theme      :ensure t :defer t)
+;(use-package zenburn-theme      :ensure t :defer t)
 
-(use-package my-theming
-  :demand t
-  :bind (("C-c t n" . my/theming-load-next-theme)
-         ("C-c t p" . my/theming-load-prev-theme))
-  :init
-  (setq my/term-theme 'monokai
-        my/gui-themes '(badwolf
-                        darktooth
-                        dichromacy
-                        leuven
-                        material
-                        monokai
-                        solarized-dark
-                        solarized-light
-                        zenburn))
-  :config
-  (if (memq window-system '(mac ns))
-      (my/theming-load-random-theme)
-    (load-theme my/term-theme t)))
+;(use-package my-theming
+;  :demand t
+;  :bind (("C-c t n" . my/theming-load-next-theme)
+;        ("C-c t p" . my/theming-load-prev-theme))
+;  :init
+;  (setq my/term-theme 'monokai
+;        my/gui-themes '(badwolf
+;                        dichromacy
+;                        material
+;                        solarized-light
+;                        zenburn))
+;  :config
+;  (if (memq window-system '(mac ns))
+;      (my/theming-load-random-theme)
+;    (load-theme my/term-theme t)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -264,19 +257,19 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; My stuff.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package my-tmux
-  :if (not (window-system)))
+;(use-package my-tmux
+;  :if (not (window-system)))
 
-(use-package my-appearance)
+;(use-package my-appearance)
 
 (use-package my-gui
   :if (display-graphic-p))
 
-(use-package my-osx
-  :if (eq system-type 'darwin))
+;(use-package my-osx
+;  :if (eq system-type 'darwin))
 
-(use-package my-windows
-  :if (eq system-type 'windows-nt))
+;(use-package my-windows
+;  :if (eq system-type 'windows-nt))
 
 (use-package my-configs)
 
@@ -379,18 +372,19 @@
 
   (setq neo-hidden-files-regexp "^\\.\\|~$\\|^#.*#$\\|^target$\\|^pom\\.*"))
 
-(use-package dash
-  :ensure t)
+;(use-package dash
+;  :ensure t)
 
-(use-package diminish
-  :ensure t
-  :config
-  (progn
-    (diminish 'undo-tree-mode)
-    (diminish 'evil-commentary-mode)))
+;(use-package diminish
+;  :ensure t
+;  :config
+;  (progn
+;    (diminish 'undo-tree-mode)
+;    (diminish 'evil-commentary-mode)))
 
 (use-package zlc
   :ensure t
+  :defer t
   :config
   (zlc-mode t)
   (let ((map minibuffer-local-map))
@@ -399,7 +393,6 @@
     (define-key map (kbd "C-p")    'zlc-select-previous-vertical)
     (define-key map (kbd "C-f") 'zlc-select-next)
     (define-key map (kbd "C-b")  'zlc-select-previous)
-
     ;; reset selection
     (define-key map (kbd "C-c") 'zlc-reset)))
 
@@ -460,7 +453,8 @@
     (add-hook 'git-timemachine-mode-hook #'evil-normalize-keymaps)))
 
 (use-package gitignore-mode
-  :ensure t)
+  :ensure t
+  :defer t)
 
 (use-package browse-at-remote
   :ensure t
@@ -509,36 +503,35 @@
 ;  :ensure t
 ;  :bind ("C-;" . avy-goto-char))
 
-(use-package ggtags
-  :init
-  (add-hook 'c-mode-common-hook
-            (lambda ()
-              (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
-                (ggtags-mode 1))))
-  (add-hook 'clojure-mode-hook (lambda () (ggtags-mode 1)))
-  (add-hook 'elixir-mode-hook (lambda () (ggtags-mode 1)))
-  (add-hook 'erlang-mode-hook (lambda () (ggtags-mode 1)))
-
-  :config
-  ;; use helm
-  (setq ggtags-completing-read-function nil)
-
-  ;; use eldoc
-  (setq-local eldoc-documentation-function #'ggtags-eldoc-function)
-
-  ;; imenu
-  (setq-local imenu-create-index-function #'ggtags-build-imenu-index)
-
-  (define-key ggtags-mode-map (kbd "s-b") 'ggtags-find-definition)
-  (define-key ggtags-mode-map (kbd "s-r") 'ggtags-find-reference)
-  (define-key ggtags-mode-map (kbd "C-c g s") 'ggtags-find-other-symbol)
-  (define-key ggtags-mode-map (kbd "C-c g h") 'ggtags-view-tag-history)
-  (define-key ggtags-mode-map (kbd "C-c g f") 'ggtags-find-file)
-  (define-key ggtags-mode-map (kbd "C-c g c") 'ggtags-create-tags)
-  (define-key ggtags-mode-map (kbd "C-c g u") 'ggtags-update-tags)
-  (define-key ggtags-mode-map (kbd "C-c g m") 'ggtags-find-tag-dwim)
-
-  (define-key ggtags-mode-map (kbd "M-,") 'pop-tag-mark))
+;(use-package ggtags
+;  :init
+;  (add-hook 'c-mode-common-hook
+;            (lambda ()
+;              (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
+;                (ggtags-mode 1))))
+;  (add-hook 'clojure-mode-hook (lambda () (ggtags-mode 1)))
+;  (add-hook 'elixir-mode-hook (lambda () (ggtags-mode 1)))
+;  (add-hook 'erlang-mode-hook (lambda () (ggtags-mode 1)))
+;
+;  :config
+;  ;; use helm
+;  (setq ggtags-completing-read-function nil)
+;
+;  ;; use eldoc
+;  (setq-local eldoc-documentation-function #'ggtags-eldoc-function)
+;
+;  ;; imenu
+;  (setq-local imenu-create-index-function #'ggtags-build-imenu-index)
+;
+;  (define-key ggtags-mode-map (kbd "s-b") 'ggtags-find-definition)
+;  (define-key ggtags-mode-map (kbd "s-r") 'ggtags-find-reference)
+;  (define-key ggtags-mode-map (kbd "C-c g s") 'ggtags-find-other-symbol)
+;  (define-key ggtags-mode-map (kbd "C-c g h") 'ggtags-view-tag-history)
+;  (define-key ggtags-mode-map (kbd "C-c g f") 'ggtags-find-file)
+;  (define-key ggtags-mode-map (kbd "C-c g c") 'ggtags-create-tags)
+;  (define-key ggtags-mode-map (kbd "C-c g u") 'ggtags-update-tags)
+;  (define-key ggtags-mode-map (kbd "C-c g m") 'ggtags-find-tag-dwim)
+;  (define-key ggtags-mode-map (kbd "M-,") 'pop-tag-mark))
 
 (use-package projectile
   :ensure t
@@ -569,33 +562,33 @@
   :init
   (setq ispell-program-name "aspell"))
 
-(use-package guide-key
-  :ensure t
-  :init
-  :diminish guide-key-mode
-  :config
-  (progn
-    (setq guide-key/guide-key-sequence t)
-    (setq guide-key/idle-delay 0.4)
-    (guide-key-mode 1)))
+;(use-package guide-key
+;  :ensure t
+;  :init
+;  :diminish guide-key-mode
+;  :config
+;  (progn
+;    (setq guide-key/guide-key-sequence t)
+;    (setq guide-key/idle-delay 0.4)
+;    (guide-key-mode 1)))
 
-(use-package popwin
-  :ensure t
-  :defer 2
-  :config
-  (progn
-    (mapcar (lambda (el) (add-to-list 'popwin:special-display-config el))
-            '(helm-mode
-              ("*Help*" :stick t)
-              ("*rspec-compilation*" :position bottom :stick t :noselect t)
-              ("*alchemist help*" :position right :stick t :width 80)
-              ("*alchemist mix*" :position bottom :noselect t)
-              ("*alchemist elixir*" :position bottom :noselect t)
-              ("*alchemist test report*" :position bottom :stick t :noselect t)
-              ("*alchemist-eval-mode*" :position bottom :height 4 :stick t)
-              ("*GHC Info*" :position bottom :stick t :noselect t)))
-    (global-set-key (kbd "C-l") popwin:keymap)
-    (popwin-mode 1)))
+;(use-package popwin
+;  :ensure t
+;  :defer 2
+;  :config
+;  (progn
+;    (mapcar (lambda (el) (add-to-list 'popwin:special-display-config el))
+;            '(helm-mode
+;              ("*Help*" :stick t)
+;              ("*rspec-compilation*" :position bottom :stick t :noselect t)
+;              ("*alchemist help*" :position right :stick t :width 80)
+;              ("*alchemist mix*" :position bottom :noselect t)
+;              ("*alchemist elixir*" :position bottom :noselect t)
+;              ("*alchemist test report*" :position bottom :stick t :noselect t)
+;              ("*alchemist-eval-mode*" :position bottom :height 4 :stick t)
+;              ("*GHC Info*" :position bottom :stick t :noselect t)))
+;    (global-set-key (kbd "C-l") popwin:keymap)
+;    (popwin-mode 1)))
 
 (use-package company
   :ensure t
@@ -616,14 +609,14 @@
     (define-key company-active-map (kbd "RET") 'company-complete-selection)
     (global-company-mode t)))
 
-(use-package yasnippet
-  :ensure t
-  :defer 4
-  :diminish yas-minor-mode
-  :config
-  (progn
-    (setq-default yas-snippet-dirs '("~/.emacs.d/snippets"))
-    (yas-global-mode t)))
+;(use-package yasnippet
+;  :ensure t
+;  :defer 4
+;  :diminish yas-minor-mode
+;  :config
+;  (progn
+;    (setq-default yas-snippet-dirs '("~/.emacs.d/snippets"))
+;    (yas-global-mode t)))
 
 ;(use-package writeroom-mode
 ;  :ensure t
@@ -703,10 +696,10 @@
         web-mode-css-indent-offset 2
         web-mode-code-indent-offset 2))
 
-(use-package js
-  ;; built-in
-  :init
-  (setq js-indent-level 2))
+;(use-package js
+;  ;; built-in
+;  :init
+;  (setq js-indent-level 2))
 
 ;(use-package scss-mode
 ;  :ensure t
@@ -717,89 +710,105 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Erlang / Elixir
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package erlang
-  :ensure t
-  ;; We need to specify erlang-mode explicitely as the package is not called
-  ;; erlang-mode.
-  :mode (("\\.erl\\'" . erlang-mode)
-         ("\\.hrl\\'" . erlang-mode)
-         ("\\.xrl\\'" . erlang-mode)
-         ("sys\\.config\\'" . erlang-mode)
-         ("rebar\\.config\\'" . erlang-mode)
-         ("\\.app\\(\\.src\\)?\\'" . erlang-mode))
-  :config
-  (setq erlang-indent-level 4))
+;(use-package erlang
+;  :ensure t
+;  :defer t
+;  ;; We need to specify erlang-mode explicitely as the package is not called
+;  ;; erlang-mode.
+;  :mode (("\\.erl\\'" . erlang-mode)
+;         ("\\.hrl\\'" . erlang-mode)
+;         ("\\.xrl\\'" . erlang-mode)
+;         ("sys\\.config\\'" . erlang-mode)
+;         ("rebar\\.config\\'" . erlang-mode)
+;         ("\\.app\\(\\.src\\)?\\'" . erlang-mode))
+;  :config
+;  (setq erlang-indent-level 4))
 
-(use-package elixir-mode
-  :ensure t
-  :load-path "~/Code/emacs-elixir"
-  :mode ("\\.ex\\'" "\\.exs\\'" "mix\\.lock\\'")
-  :config
-  (use-package flycheck-elixir)
-  ;; for elixir do-end
-  (use-package ruby-end
-    :config
-    (add-to-list 'elixir-mode-hook
-                 (defun auto-activate-ruby-end-mode-for-elixir-mode ()
-                   (set (make-variable-buffer-local 'ruby-end-expand-keywords-before-re)
-                        "\\(?:^\\|\\s-+\\)\\(?:do\\)")
-                   (set (make-variable-buffer-local 'ruby-end-check-statement-modifiers) nil)
-                   (ruby-end-mode +1)
-                   )))
-  (use-package alchemist
-    :ensure t
-    :load-path "~/Code/alchemist.el"
-    :diminish alchemist-mode
-    :init
-    (setq alchemist-test-status-modeline nil)
-    :config
-    (exec-path-from-shell-copy-env "MIX_ARCHIVES")
-    (progn
-      (evil-define-key 'normal alchemist-test-mode-map "]t" 'alchemist-test-mode-jump-to-next-test)
-      (evil-define-key 'normal alchemist-test-mode-map "[t" 'alchemist-test-mode-jump-to-previous-test)
-      (define-key evil-normal-state-map "]d" 'alchemist-goto-jump-to-next-def-symbol)
-      (define-key evil-normal-state-map "[d" 'alchemist-goto-jump-to-previous-def-symbol)
-      (define-key evil-normal-state-map "]T" '(lambda () (interactive)
-                                                (popwin:select-popup-window)
-                                                (alchemist-test-next-result)))
-      (define-key evil-normal-state-map "[T" '(lambda () (interactive)
-                                                (popwin:select-popup-window)
-                                                (alchemist-test-previous-result)))
-      (define-key alchemist-mode-map (kbd "C-c a g d") 'my/alchemist-generate-docs)
-      (define-key alchemist-mode-map (kbd "C-c a d g") 'my/alchemist-mix-deps-get)
-      (define-key alchemist-mode-map (kbd "C-c a S") 'my/alchemist-new-exs-buffer)
-      (evil-leader/set-key-for-mode 'elixir-mode
-        "t b" 'alchemist-mix-test-this-buffer
-        "t t" 'alchemist-mix-test
-        "t r" 'alchemist-mix-rerun-last-test
-        "t p" 'alchemist-mix-test-at-point
-        "e b" 'alchemist-eval-buffer
-        "a d" 'alchemist-goto-list-symbol-definitions))))
+;(use-package elixir-mode
+;  :ensure t
+;  :defer t
+;  :load-path "~/Code/emacs-elixir"
+;  :mode ("\\.ex\\'" "\\.exs\\'" "mix\\.lock\\'")
+;  :config
+;  (use-package flycheck-elixir)
+;  ;; for elixir do-end
+;  (use-package ruby-end
+;    :config
+;    (add-to-list 'elixir-mode-hook
+;                 (defun auto-activate-ruby-end-mode-for-elixir-mode ()
+;                   (set (make-variable-buffer-local 'ruby-end-expand-keywords-before-re)
+;                        "\\(?:^\\|\\s-+\\)\\(?:do\\)")
+;                   (set (make-variable-buffer-local 'ruby-end-check-statement-modifiers) nil)
+;                   (ruby-end-mode +1)
+;                   )))
+;  (use-package alchemist
+;    :ensure t
+;    :load-path "~/Code/alchemist.el"
+;    :diminish alchemist-mode
+;    :init
+;    (setq alchemist-test-status-modeline nil)
+;    :config
+;    (exec-path-from-shell-copy-env "MIX_ARCHIVES")
+;    (progn
+;      (evil-define-key 'normal alchemist-test-mode-map "]t" 'alchemist-test-mode-jump-to-next-test)
+;      (evil-define-key 'normal alchemist-test-mode-map "[t" 'alchemist-test-mode-jump-to-previous-test)
+;      (define-key evil-normal-state-map "]d" 'alchemist-goto-jump-to-next-def-symbol)
+;      (define-key evil-normal-state-map "[d" 'alchemist-goto-jump-to-previous-def-symbol)
+;      (define-key evil-normal-state-map "]T" '(lambda () (interactive)
+;                                                (popwin:select-popup-window)
+;                                                (alchemist-test-next-result)))
+;      (define-key evil-normal-state-map "[T" '(lambda () (interactive)
+;                                                (popwin:select-popup-window)
+;                                                (alchemist-test-previous-result)))
+;      (define-key alchemist-mode-map (kbd "C-c a g d") 'my/alchemist-generate-docs)
+;      (define-key alchemist-mode-map (kbd "C-c a d g") 'my/alchemist-mix-deps-get)
+;      (define-key alchemist-mode-map (kbd "C-c a S") 'my/alchemist-new-exs-buffer)
+;      (evil-leader/set-key-for-mode 'elixir-mode
+;        "t b" 'alchemist-mix-test-this-buffer
+;        "t t" 'alchemist-mix-test
+;        "t r" 'alchemist-mix-rerun-last-test
+;        "t p" 'alchemist-mix-test-at-point
+;        "e b" 'alchemist-eval-buffer
+;        "a d" 'alchemist-goto-list-symbol-definitions))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Clojure and Related things
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package clojure-mode
-  :ensure t
-  :init
-  (add-hook 'clojure-mode-hook #'yas-minor-mode)
-  (add-hook 'clojure-mode-hook #'subword-mode))
+;(use-package clojure-mode
+;  :ensure t
+;  :defer t
+;  :init
+;  (add-hook 'clojure-mode-hook #'yas-minor-mode)
+;  (add-hook 'clojure-mode-hook #'subword-mode))
 
-(use-package cider
-  :ensure t
-  :init
-  (add-hook 'cider-mode-hook #'clj-refactor-mode)
-  (add-hook 'cider-mode-hook #'company-mode)
-  (add-hook 'cider-repl-mode-hook #'company-mode)
-  :diminish subword-mode
-  :config
-  (setq nrepl-log-messages t
-        cider-repl-display-in-current-window t
-        cider-repl-use-clojure-font-lock t
-        cider-prompt-save-file-on-load 'always-save
-        cider-font-lock-dynamically '(macro core function var)
-        cider-overlays-use-font-lock t)
-  (cider-repl-toggle-pretty-printing))
+;(use-package cider
+;  :ensure t
+;  :defer t
+;  :init
+;  (add-hook 'cider-mode-hook #'clj-refactor-mode)
+;  (add-hook 'cider-mode-hook #'company-mode)
+;  (add-hook 'cider-repl-mode-hook #'company-mode)
+;  :diminish subword-mode
+;  :config
+;  (setq nrepl-log-messages t
+;        cider-repl-display-in-current-window t
+;        cider-repl-use-clojure-font-lock t
+;        cider-prompt-save-file-on-load 'always-save
+;        cider-font-lock-dynamically '(macro core function var)
+;        cider-overlays-use-font-lock t)
+;  (cider-repl-toggle-pretty-printing))
+
+;(use-package paredit
+;  :defer t
+;  :config
+;  (bind-keys :map paredit-mode-map
+;             ("C-h" . paredit-backward-delete))
+;  (defun conditionally-enable-paredit-mode ()
+;    (if (eq this-command 'eval-expression)
+;        (paredit-mode 1)))
+;  (add-hook 'minibuffer-setup-hook 'conditionally-enable-paredit-mode))
+
+;(use-package evil-paredit)
 
 ; (use-package parinfer
 ;   :ensure t
@@ -817,33 +826,36 @@
 ;     (add-hook 'clojure-mode-hook #'parinfer-mode)
 ;     (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)))
 
-(use-package cider-eval-sexp-fu)
+;(use-package cider-eval-sexp-fu)
 
-(use-package clj-refactor
-  :ensure t
-  :diminish clj-refactor-mode
-  :config (cljr-add-keybindings-with-prefix "C-c j"))
+;(use-package clj-refactor
+;  :ensure t
+;  :diminish clj-refactor-mode
+;  :config (cljr-add-keybindings-with-prefix "C-c j"))
 
-(use-package rainbow-delimiters
-  :ensure t
-  :init
-  (add-hook 'emacs-clojure-hook 'rainbow-delimiters-mode)
-  (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode))
+;(use-package rainbow-delimiters
+;  :ensure t
+;  :init
+;  (add-hook 'emacs-clojure-hook 'rainbow-delimiters-mode)
+;  (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode))
 
 
-(use-package markdown-mode
-  :ensure t
-  :mode ("\\.md\\'" "\\.mkd\\'" "\\.markdown\\'"))
+;(use-package markdown-mode
+;  :ensure t
+;  :defer t
+;  :mode ("\\.md\\'" "\\.mkd\\'" "\\.markdown\\'"))
 
 (use-package yaml-mode
   :ensure t
+  :defer t
   :mode "\\.e?ya?ml$")
 
-(use-package org-mode
-  :mode "\\.org\\'"
-  :config
-  (setq org-blank-before-new-entry '((heading . t)
-                                     (plain-list-item . auto))))
+;(use-package org-mode
+;  :mode "\\.org\\'"
+;  :defer t
+;  :config
+;  (setq org-blank-before-new-entry '((heading . t)
+;                                     (plain-list-item . auto))))
 
 ;(use-package ruby-mode
 ;  ;; built-in
@@ -908,8 +920,8 @@
 
 ;; Only maximize the window now because doing so earlier causes weird
 ;; behaviours.
-(when (display-graphic-p)
-  (toggle-frame-maximized))
+;(when (display-graphic-p)
+;  (toggle-frame-maximized))
 
 ;; Custom file handling.
 ;(setq custom-file "~/.emacs.d/etc/custom.el")
@@ -953,3 +965,6 @@
 ;;         ;; be the last entry in `display-buffer-alist', because it overrides any
 ;;         ;; later entry with more specific actions.
 ;;         ("." nil (reusable-frames . visible))))
+;; ## added by OPAM user-setup for emacs / base ## 56ab50dc8996d2bb95e7856a6eddb17b ## you can edit, but keep this line
+;(require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
+;; ## end of OPAM user-setup addition for emacs / base ## keep this line
