@@ -1,4 +1,4 @@
-;; refs. https://github.com/whatyouhide/emacs.d
+;;; refs. https://github.com/whatyouhide/emacs.d
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Initialize the package system.
@@ -15,14 +15,14 @@
 
 ;; Add custom code to the load path. `ext' contains Lisp code that I didn't
 ;; write but that is not in melpa, while `lisp' is for List code I wrote.
-(add-to-list 'load-path (expand-file-name "ext" user-emacs-directory))
+;(add-to-list 'load-path (expand-file-name "ext" user-emacs-directory))
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; global settings
+;; 全体設定
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; C-h をバックスペースにする (?\C-? は DEL のシーケンス)
-(keyboard-translate ?\C-h ?\C-?)
+(keyboard-translate (kbd "C-h") (kdb "C-?"))
 
 ;; 簡単にウィンドウを切り替える
 (define-key global-map (kbd "C-t") 'other-window)
@@ -49,7 +49,7 @@
 (define-key minibuffer-local-completion-map (kbd "C-w") 'backward-kill-word)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Global keyboarding
+;;  Global Custom keyboarding
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (global-set-key (kbd "<f8>") 'my/edit-init-file)
 (global-set-key (kbd "C-x %") 'my/split-window-horizontally-and-focus-new)
@@ -87,6 +87,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Theming
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+(load-theme 'cyberpunk-2019 t)
 ;(use-package badwolf-theme      :ensure t :defer t)
 ;(use-package material-theme     :ensure t :defer t)
 ;(use-package mustang-theme      :ensure t :defer t)
@@ -219,7 +221,7 @@
 ;    (define-key evil-normal-state-map (kbd "-") 'dired-jump)
 ;    (define-key evil-normal-state-map (kbd "H") 'back-to-indentation)
 ;    (define-key evil-normal-state-map (kbd "C-e") 'move-end-of-line)
-;    (define-key evil-normal-state-map (kbd "L") 'move-end-of-line)
+
 ;    (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
 ;    (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line)
 ;    (define-key evil-normal-state-map (kbd "C-p") 'previous-line)
@@ -372,16 +374,6 @@
 
   (setq neo-hidden-files-regexp "^\\.\\|~$\\|^#.*#$\\|^target$\\|^pom\\.*"))
 
-;(use-package dash
-;  :ensure t)
-
-;(use-package diminish
-;  :ensure t
-;  :config
-;  (progn
-;    (diminish 'undo-tree-mode)
-;    (diminish 'evil-commentary-mode)))
-
 (use-package zlc
   :ensure t
   :defer t
@@ -499,10 +491,6 @@
 ;  :ensure t
 ;  :bind ("C-s" . swiper-helm))
 
-;(use-package avy
-;  :ensure t
-;  :bind ("C-;" . avy-goto-char))
-
 ;(use-package ggtags
 ;  :init
 ;  (add-hook 'c-mode-common-hook
@@ -561,16 +549,6 @@
   ;; built-in
   :init
   (setq ispell-program-name "aspell"))
-
-;(use-package guide-key
-;  :ensure t
-;  :init
-;  :diminish guide-key-mode
-;  :config
-;  (progn
-;    (setq guide-key/guide-key-sequence t)
-;    (setq guide-key/idle-delay 0.4)
-;    (guide-key-mode 1)))
 
 ;(use-package popwin
 ;  :ensure t
@@ -695,17 +673,6 @@
   (setq web-mode-markup-indent-offset 2
         web-mode-css-indent-offset 2
         web-mode-code-indent-offset 2))
-
-;(use-package js
-;  ;; built-in
-;  :init
-;  (setq js-indent-level 2))
-
-;(use-package scss-mode
-;  :ensure t
-;  :mode "\\.scss\\'"
-;  :init
-;  (setq css-indent-offset 2))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Erlang / Elixir
@@ -839,12 +806,6 @@
 ;  (add-hook 'emacs-clojure-hook 'rainbow-delimiters-mode)
 ;  (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode))
 
-
-;(use-package markdown-mode
-;  :ensure t
-;  :defer t
-;  :mode ("\\.md\\'" "\\.mkd\\'" "\\.markdown\\'"))
-
 (use-package yaml-mode
   :ensure t
   :defer t
@@ -857,78 +818,17 @@
 ;  (setq org-blank-before-new-entry '((heading . t)
 ;                                     (plain-list-item . auto))))
 
-;(use-package ruby-mode
-;  ;; built-in
-;  :init
-;  ;; Don't insert the "coding utf8" comment when saving Ruby files.
-;  (setq ruby-insert-encoding-magic-comment nil))
-
-;(use-package rspec-mode
-;  :ensure t
-;  :defer t
-;  :init
-;  (setq rspec-use-rake-when-possible nil))
-
-;(use-package rbenv
-;  :ensure t
-;  :init
-;  (setq rbenv-installation-dir "/usr/local/Cellar/rbenv/0.4.0"))
-
-;(use-package projectile-rails
-;  :ensure t
-;  :defer t
-;  :init
-;  (add-hook 'projectile-mode-hook 'projectile-rails-on))
-
 ;(use-package sh-script
 ;  ;; built-in
 ;  :demand t
 ;  :mode (("\\.zsh\\'" . shell-script-mode)))
 
-;(use-package haskell-mode
-;  :ensure t
-;  :mode ("\\.hs\\'" "\\.lhs\\'")
-;  :init
-;  (setq haskell-process-suggest-remove-import-lines t
-;        haskell-process-log t
-;        haskell-stylish-on-save t)
-;  (use-package ghc
-;    :ensure t
-;    :init
-;    (add-hook 'haskell-mode-hook (lambda () (ghc-init)))
-;    (use-package company-ghc
-;      :ensure t
-;      :config
-;      (add-to-list 'company-backends 'company-ghc)))
-;  :config
-;  (define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-file))
-
-;(use-package rust-mode
-;  :ensure t
-;  :mode "\\.rs\\'")
-
-;(use-package go-mode
-;  :ensure t
-;  :mode "\\.go\\'"
-;  :config
-;  (add-hook 'go-mode-hook
-;            (lambda ()
-;              (setq-local tab-width 4)
-;              (setq gofmt-command "goimports")
-;              (add-hook 'before-save-hook 'gofmt-before-save))))
-
-
-;; Only maximize the window now because doing so earlier causes weird
-;; behaviours.
-;(when (display-graphic-p)
-;  (toggle-frame-maximized))
 
 ;; Custom file handling.
 ;(setq custom-file "~/.emacs.d/etc/custom.el")
 ;(when (not (file-exists-p custom-file))
 ;  (with-temp-buffer (write-file custom-file)))
 ;(load custom-file)
-
 
 ;; ;;; Buffer, Windows and Frames
 ;; (setq frame-title-format
