@@ -4,12 +4,9 @@
 (when (< emacs-major-version 23)
   (defvar user-emacs-directory "~/.emacs.d/"))
 
-(require 'package)
 (setq package-enable-at-startup nil)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
-
-(package-initialize)
 
 ;; Add custom code to the load path. `ext' contains Lisp code that I didn't
 ;; write but that is not in melpa, while `lisp' is for List code I wrote.
@@ -97,29 +94,38 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;  Global Custom keyboarding
+;;  Global Custom keybindings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (global-set-key (kbd "<f8>") 'my/edit-init-file)
 (global-set-key (kbd "C-x %") 'my/split-window-horizontally-and-focus-new)
 (global-set-key (kbd "C-x -") 'my/split-window-vertically-and-focus-new)
-;(global-set-key (kbd "C-k") 'kill-whole-line)
-
 ;; Always as "y or n", not that annoying "yes or no".
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Bootstrap `use-package'.
+;; Bootstrap `straight.el'.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
-;; Make use-package available.
-(require 'use-package)
+;; Fallback to `use-package'
+(straight-use-package 'use-package)
+;; `use-package' のバックエンドで `straight.el' をデフォルトで使用する
+(setq straight-use-package-by-default t)
 
 (use-package exec-path-from-shell
-  :ensure t
+  ;; :ensure t
   :if (memq window-system '(mac ns))
   :config
   (progn
@@ -133,34 +139,24 @@
 ;; Theming
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
-(load-theme 'cyberpunk-2019 t)
-;(use-package badwolf-theme      :ensure t :defer t)
-;(use-package material-theme     :ensure t :defer t)
-;(use-package mustang-theme      :ensure t :defer t)
-;(use-package zenburn-theme      :ensure t :defer t)
+(use-package doom-themes :defer t)
+(load-theme 'doom-one t)
 
 ;(use-package my-theming
-;  :demand t
-;  :bind (("C-c t n" . my/theming-load-next-theme)
-;        ("C-c t p" . my/theming-load-prev-theme))
-;  :init
-;  (setq my/term-theme 'monokai
-;        my/gui-themes '(badwolf
-;                        dichromacy
-;                        material
-;                        solarized-light
-;                        zenburn))
-;  :config
-;  (if (memq window-system '(mac ns))
-;      (my/theming-load-random-theme)
-;    (load-theme my/term-theme t)))
-
+;:demand t
+;:bind (((kbd "C-c t n") . my/theming-load-next-theme)
+;      ((kbd "C-c t p") . my/theming-load-prev-theme))
+;:init
+;(setq my/gui-themes '(doom-one
+;                      doom-dracula
+;                      material
+;                      zenburn))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Evil.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package evil
-  :ensure t
+  ;; :ensure t
   :config
   (evil-mode 1)
   ;; Modes that don't use evil.
@@ -178,7 +174,6 @@
 
 ;; evil-leader-mode
 (use-package evil-leader
-  :ensure t
   :config
   (setq evil-leader/in-all-status 1)
   (global-evil-leader-mode)
@@ -186,27 +181,23 @@
 
 ;; evil-visualstar-mode
 (use-package evil-visualstar
-  :ensure t
   :config
   ;(evil-visualstar/persistant 1)
   (global-evil-visualstar-mode 1))
 
 ;; evil-soround
 (use-package evil-surround
-  :ensure t
   :config
   (global-evil-surround-mode 1))
 
 ;; evil-matchit
 (use-package evil-matchit
-  :ensure t
   :config
   (global-evil-matchit-mode 1))
 
 ;; evil-nerd-commenter
 ;; Emacs key bindings
 (use-package evil-nerd-commenter
-  :ensure t
   :config
   (global-set-key (kbd "s-/") 'evilnc-comment-or-uncomment-lines)
   (global-set-key (kbd "C-c l") 'evilnc-quick-comment-or-uncomment-to-the-line)
@@ -226,7 +217,7 @@
 ;; evil-search-highlight-persist
 ;;(require 'highlight)
 (use-package evil-search-highlight-persist
-  :ensure t
+  ;; :ensure t
   :config
   ; escape でハイライトを消す
   (define-key evil-normal-state-map [escape] 'evil-search-highlight-persist-remove-all)
@@ -350,7 +341,7 @@
   (neo-buffer--refresh t))
 
 (use-package neotree
-  :ensure t
+  ;; :ensure t
   :config
   (evil-leader/set-key "n" 'neotree-toggle)
   (evil-leader/set-key "m" 'neotree-projectile-action)
@@ -404,7 +395,7 @@
   (setq neo-hidden-files-regexp "^\\.\\|~$\\|^#.*#$\\|^target$\\|^pom\\.*"))
 
 (use-package zlc
-  :ensure t
+  ;; :ensure t
   :defer t
   :config
   (zlc-mode t)
@@ -440,18 +431,18 @@
 ;  (add-hook 'magit-blame-mode (lambda () (message "hello"))))
 
 (use-package git-gutter+
-  :ensure t
+  ;; :ensure t
   :diminish git-gutter+-mode
   :config
   (progn
     (global-git-gutter+-mode)
-    (use-package git-gutter-fringe+ :ensure t)
+    (use-package git-gutter-fringe+ t)
     (define-key evil-normal-state-map "[h" 'git-gutter+-previous-hunk)
     (define-key evil-normal-state-map "]h" 'git-gutter+-next-hunk)
     (evil-leader/set-key "g +" 'git-gutter+-stage-hunks)))
 
 (use-package git-messenger
-  :ensure t
+  ;; :ensure t
   :commands git-messenger:popup-message
   :init
   (setq git-messenger:show-detail t)
@@ -463,7 +454,7 @@
     (define-key git-messenger-map (kbd "RET") 'git-messenger:popup-close)))
 
 (use-package git-timemachine
-  :ensure t
+  ;; :ensure t
   :commands git-timemachine-toggle
   :init
   (evil-leader/set-key "g t" 'git-timemachine-toggle)
@@ -473,21 +464,19 @@
     ;; force update evil keymaps after git-timemachine-mode loaded
     (add-hook 'git-timemachine-mode-hook #'evil-normalize-keymaps)))
 
-(use-package gitignore-mode
-  :ensure t
-  :defer t)
+(use-package gitignore-mode :defer t)
 
+;; 指定した行を`github'で開く
 (use-package browse-at-remote
-  :ensure t
   :commands browse-at-remote/browse
   :init
-  (evil-leader/set-key "g b" 'browse-at-remote/browse))
+  (evilg-leader/set-key "g b" 'browse-at-remote/browse))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Helm-related things.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package helm
-  :ensure t
+  ;; :ensure t
   :diminish helm-mode
   :bind (("C-S-a" . helm-M-x)
          ("C-S-n" . helm-find-files)
@@ -505,7 +494,7 @@
   (add-to-list 'helm-completing-read-handlers-alist '(find-file . nil)))
 
 (use-package helm-ag
-  :ensure t
+  ;; :ensure t
   :commands (helm-do-ag helm-do-ag-project-root)
   :init
   (evil-leader/set-key
@@ -547,12 +536,11 @@
 ;  (define-key ggtags-mode-map (kbd "M-,") 'pop-tag-mark))
 
 (use-package projectile
-  :ensure t
+  ;; :ensure t
   :commands (projectile-find-file projectile-switch-project)
   :diminish projectile-mode
   :init
-  (use-package helm-projectile
-    :ensure t)
+  (use-package helm-projectile t)
   (evil-leader/set-key
     "p" 'helm-projectile-switch-project
     "f" 'helm-projectile-find-file
@@ -594,7 +582,6 @@
 ;    (popwin-mode 1)))
 
 (use-package company
-  :ensure t
   :defer 4
   :diminish company-mode
   :config
@@ -670,7 +657,7 @@
 ;  (beacon-mode 1))
 
 (use-package hl-todo
-  :ensure t
+  ;; :ensure t
   :defer 1
   :config
   (global-hl-todo-mode))
@@ -692,7 +679,7 @@
 ;; Modes for programming languages and such.
 
 (use-package web-mode
-  :ensure t
+  ;; :ensure t
   :mode (("\\.html\\.erb\\'" . web-mode))
   :config
   (setq web-mode-markup-indent-offset 2
@@ -790,33 +777,7 @@
 ;        cider-overlays-use-font-lock t)
 ;  (cider-repl-toggle-pretty-printing))
 
-;(use-package paredit
-;  :defer t
-;  :config
-;  (bind-keys :map paredit-mode-map
-;             ("C-h" . paredit-backward-delete))
-;  (defun conditionally-enable-paredit-mode ()
-;    (if (eq this-command 'eval-expression)
-;        (paredit-mode 1)))
-;  (add-hook 'minibuffer-setup-hook 'conditionally-enable-paredit-mode))
-
 ;(use-package evil-paredit)
-
-; (use-package parinfer
-;   :ensure t
-;   :bind
-;   (("C-," . parinfer-toggle-mode))
-;   :init
-;   (progn
-;     (setq parinfer-extensions
-;           '(defaults       ; should be included.
-;             pretty-parens  ; different paren styles for different modes.
-;             evil           ; If you use Evil.
-;             ;lispy          ; If you use Lispy. With this extension, you should install Lispy and do not enable lispy-mode directly.
-;             smart-tab      ; C-b & C-f jump positions and smart shift with tab & S-tab.
-;             smart-yank))   ; Yank behavior depend on mode.
-;     (add-hook 'clojure-mode-hook #'parinfer-mode)
-;     (add-hook 'emacs-lisp-mode-hook #'parinfer-mode)))
 
 ;(use-package cider-eval-sexp-fu)
 
@@ -825,35 +786,10 @@
 ;  :diminish clj-refactor-mode
 ;  :config (cljr-add-keybindings-with-prefix "C-c j"))
 
-;(use-package rainbow-delimiters
-;  :ensure t
-;  :init
-;  (add-hook 'emacs-clojure-hook 'rainbow-delimiters-mode)
-;  (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode))
-
 (use-package yaml-mode
-  :ensure t
+  ;; :ensure t
   :defer t
   :mode "\\.e?ya?ml$")
-
-;(use-package org-mode
-;  :mode "\\.org\\'"
-;  :defer t
-;  :config
-;  (setq org-blank-before-new-entry '((heading . t)
-;                                     (plain-list-item . auto))))
-
-;(use-package sh-script
-;  ;; built-in
-;  :demand t
-;  :mode (("\\.zsh\\'" . shell-script-mode)))
-
-
-;; Custom file handling.
-;(setq custom-file "~/.emacs.d/etc/custom.el")
-;(when (not (file-exists-p custom-file))
-;  (with-temp-buffer (write-file custom-file)))
-;(load custom-file)
 
 ;; ;;; Buffer, Windows and Frames
 ;; (setq frame-title-format
@@ -862,8 +798,7 @@
 ;;       ;; Size new windows proportionally wrt other windows
 ;;       window-combination-resize t)
 
-
-;; ;; Configure `display-buffer' behaviour for some special buffers.
+;; Configure `display-buffer' behaviour for some special buffers.
 ;; (setq display-buffer-alist
 ;;       `(
 ;;         ;; Nail Helm to the side window
@@ -890,6 +825,6 @@
 ;;         ;; be the last entry in `display-buffer-alist', because it overrides any
 ;;         ;; later entry with more specific actions.
 ;;         ("." nil (reusable-frames . visible))))
-;; ## added by OPAM user-setup for emacs / base ## 56ab50dc8996d2bb95e7856a6eddb17b ## you can edit, but keep this line
-;(require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
-;; ## end of OPAM user-setup addition for emacs / base ## keep this line
+## added by OPAM user-setup for emacs / base ## 56ab50dc8996d2bb95e7856a6eddb17b ## you can edit, but keep this line
+(require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
+## end of OPAM user-setup addition for emacs / base ## keep this line

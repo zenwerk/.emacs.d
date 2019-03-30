@@ -2,8 +2,12 @@ projectile-bookmarks.eld
 recentf
 helm-doc.org
 auto-save-list
+
+# 自動生成ディレクトリ
 elpa/
 eshell/
+straight/
+
 GPATH
 GRTAGS
 GTAGS

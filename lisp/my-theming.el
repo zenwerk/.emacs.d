@@ -27,12 +27,6 @@
          (theme (my/theming--prev-element current-idx my/gui-themes)))
     (my/theming-load-theme theme)))
 
-(defun my/theming-load-random-theme ()
-  "Load a random theme from `my/theming-current-theme' (or just a nice terminal
-theme if we're in the terminal."
-  (interactive)
-  (my/theming-load-theme (my/random-element my/gui-themes)))
-
 ;; Tells whether there's a currently set theme.
 (defun my/theming--theme-set-p ()
   (boundp 'my/theming-current-theme))
