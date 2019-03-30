@@ -1,5 +1,3 @@
-;;; refs. https://github.com/whatyouhide/emacs.d
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Initialize the package system.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -22,10 +20,8 @@
 ;; 全体設定
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; C-h をバックスペースにする (?\C-? は DEL のシーケンス)
-(keyboard-translate (kbd "C-h") (kdb "C-?"))
-
-;; 簡単にウィンドウを切り替える
-(define-key global-map (kbd "C-t") 'other-window)
+(define-key
+  key-translation-map (kbd "C-h") (kbd "<DEL>"))
 
 ;; ビープ音の無効化
 (setq ring-bell-function 'ignore)
@@ -48,15 +44,64 @@
 ;; ミニバッファで C-w で単語区切りで削除
 (define-key minibuffer-local-completion-map (kbd "C-w") 'backward-kill-word)
 
+;; マッチする()を強調
+(show-paren-mode 1)
+
+;; モードラインのカラム数を表示
+(column-number-mode 1)
+
+;; Don't display the start messages when Emacs starts.
+(setq inhibit-splash-screen t
+      inhibit-startup-echo-area-message t
+      inhibit-startup-message t)
+
+;; ツールバー, メニューバー, スクロールバー非表示
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+(menu-bar-mode -1)
+
+;; 保存時に末尾空白文字削除
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+;; ファイル行末改行
+(setq require-final-newline t)
+
+;; Show trailing whitespace on programming modes.
+(add-hook 'prog-mode-hook
+          '(lambda () (setq-default show-trailing-whitespace t)))
+
+;; Scroll output in compile buffers.
+(setq compilation-scroll-output t)
+
+;; Don't backup/autosave files and don't protect from locks.
+(setq backup-inhibited t
+      auto-save-default nil
+      create-lockfiles nil)
+
+;; Indentation is two spaces wide, with spaces instead of tabs.
+(setq-default indent-tabs-mode nil
+              tab-width 4)
+
+;; Wrap at 80 characters.
+(setq-default fill-column 120)
+
+;; Scrolling:
+;; - `scroll-margin': always have a margin of 8 lines on top/bottom
+;; - `scroll-conservatively': jump abruptedly every this lines. If set to very
+;;   high, basically never jumps :)
+(setq scroll-margin 8
+      scroll-conservatively 100000)
+
+;; utf-8 を基本的に使用する
+(prefer-coding-system 'utf-8)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  Global Custom keyboarding
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (global-set-key (kbd "<f8>") 'my/edit-init-file)
 (global-set-key (kbd "C-x %") 'my/split-window-horizontally-and-focus-new)
 (global-set-key (kbd "C-x -") 'my/split-window-vertically-and-focus-new)
-;(global-set-key (kbd "C-x p") (lambda () (interactive) (other-window -1)))
-;(global-set-key (kbd "C-x O") 'other-frame)
-;(global-set-key (kbd "C-x B") 'my/switch-to-previous-buffer)
 ;(global-set-key (kbd "C-k") 'kill-whole-line)
 
 ;; Always as "y or n", not that annoying "yes or no".
@@ -123,8 +168,7 @@
                                        '(alchemist-iex-mode)))
   ;; j,k で物理行移動, gj,gk で論理行移動
   (defun evil-swap-key (map key1 key2)
-    ;; MAP中のKEY1とKEY2を入れ替え
-    "Swap KEY1 and KEY2 in MAP."
+    "MAP中のKEY1とKEY2を入れ替え"
     (let ((def1 (lookup-key map key1))
           (def2 (lookup-key map key2)))
       (define-key map key1 def2)
@@ -132,7 +176,7 @@
   (evil-swap-key evil-motion-state-map "j" "gj")
   (evil-swap-key evil-motion-state-map "k" "gk"))
 
-  ;; evil-leader-mode
+;; evil-leader-mode
 (use-package evil-leader
   :ensure t
   :config
@@ -239,15 +283,15 @@
 ;                                           magit-popup-mode
 ;                                           magit-popup-sequence-mode
 ;                                           xkcd-mode)))))
-;
+
 ;(use-package evil-commentary
 ;  :ensure t
 ;  :config
 ;  (evil-commentary-mode))
-;
+
 ;(use-package evil-terminal-cursor-changer
 ;  :ensure t)
-;
+
 ;(use-package evil-surround
 ;  :ensure t
 ;  :config
@@ -259,11 +303,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; My stuff.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;(use-package my-tmux
-;  :if (not (window-system)))
-
-;(use-package my-appearance)
-
 (use-package my-gui
   :if (display-graphic-p))
 
@@ -273,19 +312,10 @@
 ;(use-package my-windows
 ;  :if (eq system-type 'windows-nt))
 
-(use-package my-configs)
-
 (use-package my-scratch-buffer
   :commands my/scratch-buffer-create-or-prompt
   :init
   (evil-leader/set-key "S" 'my/scratch-buffer-create-or-prompt))
-
-;(use-package my-notes
-  ;;; We need this package as it exports a variable that we'll use later on.
-  ;:demand t
-  ;:commands my/notes-open-or-create
-  ;:init
-  ;(evil-leader/set-key "N" 'my/notes-open-or-create))
 
 (use-package my-smarter-beginning-of-line
   :bind ("C-a" . my/smarter-beginning-of-line))
@@ -371,7 +401,6 @@
                                      'pe/get-directory-tree-external)
                                (pe/toggle-omit t)))))
               neotree-mode-map))
-
   (setq neo-hidden-files-regexp "^\\.\\|~$\\|^#.*#$\\|^target$\\|^pom\\.*"))
 
 (use-package zlc
@@ -486,10 +515,6 @@
   (progn
     (evil-make-overriding-map helm-ag-mode-map 'normal)
     (add-hook 'helm-ag-mode-hook #'evil-normalize-keymaps)))
-
-;(use-package swiper-helm
-;  :ensure t
-;  :bind ("C-s" . swiper-helm))
 
 ;(use-package ggtags
 ;  :init
