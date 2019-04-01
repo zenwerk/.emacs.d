@@ -5,8 +5,8 @@
   (defvar user-emacs-directory "~/.emacs.d/"))
 
 (setq package-enable-at-startup nil)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
+;(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+;(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
 
 ;; Add custom code to the load path. `ext' contains Lisp code that I didn't
 ;; write but that is not in melpa, while `lisp' is for List code I wrote.
@@ -295,21 +295,26 @@
 ;; My stuff.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package my-gui
+  :straight nil
   :if (display-graphic-p))
 
-;(use-package my-osx
-;  :if (eq system-type 'darwin))
+(use-package my-osx
+  :straight nil
+  :if (eq system-type 'darwin))
 
-;(use-package my-windows
-;  :if (eq system-type 'windows-nt))
+(use-package my-windows
+  :straight nil
+  :if (eq system-type 'windows-nt))
 
-(use-package my-scratch-buffer
-  :commands my/scratch-buffer-create-or-prompt
-  :init
-  (evil-leader/set-key "S" 'my/scratch-buffer-create-or-prompt))
+;; (use-package my-scratch-buffer
+;;   :straight nil
+;;   :commands my/scratch-buffer-create-or-prompt
+;;   :init
+;;   (evil-leader/set-key "S" 'my/scratch-buffer-create-or-prompt))
 
-(use-package my-smarter-beginning-of-line
-  :bind ("C-a" . my/smarter-beginning-of-line))
+;; (use-package my-smarter-beginning-of-line
+;;   :straight nil
+;;   :bind ("C-a" . my/smarter-beginning-of-line))
 
 ;; Built-in packages.
 
@@ -330,83 +335,157 @@
 ;; NeoTree
 ;; https://github.com/andrewmcveigh/emacs.d/blob/master/lisp/init-neotree.el
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; (require 'dired)
-(defun neotree-copy-file ()
-  (interactive)
-  (let* ((current-path (neo-buffer--get-filename-current-line))
-         (msg (format "Copy [%s] to: "
-                      (neo-path--file-short-name current-path)))
-         (to-path (read-file-name msg (file-name-directory current-path))))
-    (dired-copy-file current-path to-path t))
-  (neo-buffer--refresh t))
+;; (defun neotree-copy-file ()
+;;   (interactive)
+;;   (let* ((current-path (neo-buffer--get-filename-current-line))
+;;          (msg (format "Copy [%s] to: "
+;;                       (neo-path--file-short-name current-path)))
+;;          (to-path (read-file-name msg (file-name-directory current-path))))
+;;     (dired-copy-file current-path to-path t))
+;;   (neo-buffer--refresh t))
 
-(use-package neotree
-  ;; :ensure t
-  :config
-  (evil-leader/set-key "n" 'neotree-toggle)
-  (evil-leader/set-key "m" 'neotree-projectile-action)
-  ;; 隠しファイルをデフォルトで表示
-  (setq neo-show-hidden-files t)
-  ;; neotree でファイルを新規作成した後、自動的にファイルを開く
-  (setq neo-create-file-auto-open t)
-  ;; delete-other-window で neotree ウィンドウを消さない
-  (setq neo-persist-show t)
-  ;; neotree ウィンドウを表示する毎に current file のあるディレクトリを表示する
-  (setq neo-smart-open t)
-  (define-minor-mode neotree-evil
-    "Use NERDTree bindings on neotree."
-    :lighter " NT"
-    :keymap (progn
-              (evil-make-overriding-map neotree-mode-map 'normal t)
-              (evil-define-key 'normal neotree-mode-map
-                "C" 'neotree-change-root
-                "U" 'neotree-select-up-node
-                "r" 'neotree-refresh
-                "o" 'neotree-enter
-                (kbd "<return>") 'neotree-enter
-                "i" 'neotree-enter-horizontal-split
-                "s" 'neotree-enter-vertical-split
-                "n" 'evil-search-next
-                "N" 'evil-search-previous
-                "ma" 'neotree-create-node
-                "mc" 'neotree-copy-file
-                "md" 'neotree-delete-node
-                "mm" 'neotree-rename-node
-                "gg" 'evil-goto-first-line
-                "gi" (lambda ()
-                       (interactive)
-                       (if (string= pe/get-directory-tree-external-command
-                                    nt/gitignore-files-cmd)
-                           (progn (setq pe/get-directory-tree-external-command
-                                        nt/all-files-cmd))
-                         (progn (setq pe/get-directory-tree-external-command
-                                      nt/gitignore-files-cmd)))
-                       (nt/refresh))
-                "I" (lambda ()
-                      (interactive)
-                      (if pe/omit-enabled
-                          (progn (setq pe/directory-tree-function
-                                       'pe/get-directory-tree-async)
-                                 (pe/toggle-omit nil))
-                        (progn (setq pe/directory-tree-function
-                                     'pe/get-directory-tree-external)
-                               (pe/toggle-omit t)))))
-              neotree-mode-map))
-  (setq neo-hidden-files-regexp "^\\.\\|~$\\|^#.*#$\\|^target$\\|^pom\\.*"))
+;; (use-package neotree
+;;   ;; :ensure t
+;;   :config
+;;   (evil-leader/set-key "n" 'neotree-toggle)
+;;   (evil-leader/set-key "m" 'neotree-projectile-action)
+;;   ;; 隠しファイルをデフォルトで表示
+;;   (setq neo-show-hidden-files t)
+;;   ;; neotree でファイルを新規作成した後、自動的にファイルを開く
+;;   (setq neo-create-file-auto-open t)
+;;   ;; delete-other-window で neotree ウィンドウを消さない
+;;   (setq neo-persist-show t)
+;;   ;; neotree ウィンドウを表示する毎に current file のあるディレクトリを表示する
+;;   (setq neo-smart-open t)
+;;   (define-minor-mode neotree-evil
+;;     "Use NERDTree bindings on neotree."
+;;     :lighter " NT"
+;;     :keymap (progn
+;;               (evil-make-overriding-map neotree-mode-map 'normal t)
+;;               (evil-define-key 'normal neotree-mode-map
+;;                 "C" 'neotree-change-root
+;;                 "U" 'neotree-select-up-node
+;;                 "r" 'neotree-refresh
+;;                 "o" 'neotree-enter
+;;                 (kbd "<return>") 'neotree-enter
+;;                 "i" 'neotree-enter-horizontal-split
+;;                 "s" 'neotree-enter-vertical-split
+;;                 "n" 'evil-search-next
+;;                 "N" 'evil-search-previous
+;;                 "ma" 'neotree-create-node
+;;                 "mc" 'neotree-copy-file
+;;                 "md" 'neotree-delete-node
+;;                 "mm" 'neotree-rename-node
+;;                 "gg" 'evil-goto-first-line
+;;                 "gi" (lambda ()
+;;                        (interactive)
+;;                        (if (string= pe/get-directory-tree-external-command
+;;                                     nt/gitignore-files-cmd)
+;;                            (progn (setq pe/get-directory-tree-external-command
+;;                                         nt/all-files-cmd))
+;;                          (progn (setq pe/get-directory-tree-external-command
+;;                                       nt/gitignore-files-cmd)))
+;;                        (nt/refresh))
+;;                 "I" (lambda ()
+;;                       (interactive)
+;;                       (if pe/omit-enabled
+;;                           (progn (setq pe/directory-tree-function
+;;                                        'pe/get-directory-tree-async)
+;;                                  (pe/toggle-omit nil))
+;;                         (progn (setq pe/directory-tree-function
+;;                                      'pe/get-directory-tree-external)
+;;                                (pe/toggle-omit t)))))
+;;               neotree-mode-map))
+;;   (setq neo-hidden-files-regexp "^\\.\\|~$\\|^#.*#$\\|^target$\\|^pom\\.*"))
 
-(use-package zlc
-  ;; :ensure t
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Treemacs
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package treemacs
   :defer t
+  :init
+  (with-eval-after-load 'winum
+    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
   :config
-  (zlc-mode t)
-  (let ((map minibuffer-local-map))
-    ;; like menu select
-    (define-key map (kbd "C-n")  'zlc-select-next-vertical)
-    (define-key map (kbd "C-p")    'zlc-select-previous-vertical)
-    (define-key map (kbd "C-f") 'zlc-select-next)
-    (define-key map (kbd "C-b")  'zlc-select-previous)
-    ;; reset selection
-    (define-key map (kbd "C-c") 'zlc-reset)))
+  (progn
+    (setq treemacs-collapse-dirs                 (if (executable-find "python") 3 0)
+          treemacs-deferred-git-apply-delay      0.5
+          treemacs-display-in-side-window        t
+          treemacs-eldoc-display                 t
+          treemacs-file-event-delay              5000
+          treemacs-file-follow-delay             0.2
+          treemacs-follow-after-init             t
+          treemacs-git-command-pipe              ""
+          treemacs-goto-tag-strategy             'refetch-index
+          treemacs-indentation                   2
+          treemacs-indentation-string            " "
+          treemacs-is-never-other-window         nil
+          treemacs-max-git-entries               5000
+          treemacs-no-png-images                 nil
+          treemacs-no-delete-other-windows       t
+          treemacs-project-follow-cleanup        nil
+          treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+          treemacs-recenter-distance             0.1
+          treemacs-recenter-after-file-follow    nil
+          treemacs-recenter-after-tag-follow     nil
+          treemacs-recenter-after-project-jump   'always
+          treemacs-recenter-after-project-expand 'on-distance
+          treemacs-show-cursor                   nil
+          treemacs-show-hidden-files             t
+          treemacs-silent-filewatch              nil
+          treemacs-silent-refresh                nil
+          treemacs-sorting                       'alphabetic-desc
+          treemacs-space-between-root-nodes      t
+          treemacs-tag-follow-cleanup            t
+          treemacs-tag-follow-delay              1.5
+          treemacs-width                         35)
+
+    ;; The default width and height of the icons is 22 pixels. If you are
+    ;; using a Hi-DPI display, uncomment this to double the icon size.
+    ;;(treemacs-resize-icons 44)
+
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode t)
+    (pcase (cons (not (null (executable-find "git")))
+                 (not (null (executable-find "python3"))))
+      (`(t . t)
+       (treemacs-git-mode 'deferred))
+      (`(t . _)
+       (treemacs-git-mode 'simple))))
+  :bind
+  (:map global-map
+        ("M-0"       . treemacs-select-window)
+        ("C-x t 1"   . treemacs-delete-other-windows)
+        ("C-x t t"   . treemacs)
+        ("C-x t B"   . treemacs-bookmark)
+        ("C-x t C-t" . treemacs-find-file)
+        ("C-x t M-t" . treemacs-find-tag)))
+
+(use-package treemacs-evil
+  :after treemacs)
+
+(use-package treemacs-projectile
+  :after treemacs projectile)
+
+(use-package treemacs-icons-dired
+  :after treemacs dired
+  :config (treemacs-icons-dired-mode))
+
+;; (use-package zlc
+;;   ;; :ensure t
+;;   :defer t
+;;   :config
+;;   (zlc-mode t)
+;;   (let ((map minibuffer-local-map))
+;;     ;; like menu select
+;;     (define-key map (kbd "C-n") 'zlc-select-next-vertical)
+;;     (define-key map (kbd "C-p") 'zlc-select-previous-vertical)
+;;     (define-key map (kbd "C-f") 'zlc-select-next)
+;;     (define-key map (kbd "C-b") 'zlc-select-previous)
+;;     ;; reset selection
+;;     (define-key map (kbd "C-c") 'zlc-reset)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Git-related things.
@@ -431,12 +510,11 @@
 ;  (add-hook 'magit-blame-mode (lambda () (message "hello"))))
 
 (use-package git-gutter+
-  ;; :ensure t
   :diminish git-gutter+-mode
   :config
   (progn
     (global-git-gutter+-mode)
-    (use-package git-gutter-fringe+ t)
+    (use-package git-gutter-fringe+ :defer t)
     (define-key evil-normal-state-map "[h" 'git-gutter+-previous-hunk)
     (define-key evil-normal-state-map "]h" 'git-gutter+-next-hunk)
     (evil-leader/set-key "g +" 'git-gutter+-stage-hunks)))
@@ -470,7 +548,7 @@
 (use-package browse-at-remote
   :commands browse-at-remote/browse
   :init
-  (evilg-leader/set-key "g b" 'browse-at-remote/browse))
+  (evil-leader/set-key "g b" 'browse-at-remote/browse))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Helm-related things.
@@ -540,7 +618,7 @@
   :commands (projectile-find-file projectile-switch-project)
   :diminish projectile-mode
   :init
-  (use-package helm-projectile t)
+  (use-package helm-projectile :defer t)
   (evil-leader/set-key
     "p" 'helm-projectile-switch-project
     "f" 'helm-projectile-find-file
@@ -825,6 +903,7 @@
 ;;         ;; be the last entry in `display-buffer-alist', because it overrides any
 ;;         ;; later entry with more specific actions.
 ;;         ("." nil (reusable-frames . visible))))
-## added by OPAM user-setup for emacs / base ## 56ab50dc8996d2bb95e7856a6eddb17b ## you can edit, but keep this line
-(require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
-## end of OPAM user-setup addition for emacs / base ## keep this line
+
+;;## added by OPAM user-setup for emacs / base ## 56ab50dc8996d2bb95e7856a6eddb17b ## you can edit, but keep this line
+;;(require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
+;;## end of OPAM user-setup addition for emacs / base ## keep this line
