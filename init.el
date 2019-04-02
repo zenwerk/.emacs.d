@@ -8,10 +8,9 @@
 ;(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 ;(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
 
-;; Add custom code to the load path. `ext' contains Lisp code that I didn't
-;; write but that is not in melpa, while `lisp' is for List code I wrote.
-;(add-to-list 'load-path (expand-file-name "ext" user-emacs-directory))
+;; 指定したディレクトリを `load-path' に加える
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+(add-to-list 'load-path (expand-file-name "config" user-emacs-directory))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 全体設定
@@ -223,6 +222,243 @@
   (define-key evil-normal-state-map [escape] 'evil-search-highlight-persist-remove-all)
   (global-evil-search-highlight-persist t))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; My stuff.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package my-gui
+  :straight nil
+  :if (display-graphic-p))
+
+(use-package my-osx
+  :straight nil
+  :if (eq system-type 'darwin))
+
+(use-package my-windows
+  :straight nil
+  :if (eq system-type 'windows-nt))
+
+;; (use-package my-scratch-buffer
+;;   :straight nil
+;;   :commands my/scratch-buffer-create-or-prompt
+;;   :init
+;;   (evil-leader/set-key "S" 'my/scratch-buffer-create-or-prompt))
+
+;; (use-package my-smarter-beginning-of-line
+;;   :straight nil
+;;   :bind ("C-a" . my/smarter-beginning-of-line))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Treemacs
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package treemacs
+  :defer t
+  :init
+  (with-eval-after-load 'winum
+    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+  :config
+  (progn
+    (setq treemacs-collapse-dirs                 (if (executable-find "python") 3 0)
+          treemacs-deferred-git-apply-delay      0.5
+          treemacs-display-in-side-window        t
+          treemacs-eldoc-display                 t
+          treemacs-file-event-delay              5000
+          treemacs-file-follow-delay             0.2
+          treemacs-follow-after-init             t
+          treemacs-git-command-pipe              ""
+          treemacs-goto-tag-strategy             'refetch-index
+          treemacs-indentation                   2
+          treemacs-indentation-string            " "
+          treemacs-is-never-other-window         nil
+          treemacs-max-git-entries               5000
+          treemacs-no-png-images                 nil
+          treemacs-no-delete-other-windows       t
+          treemacs-project-follow-cleanup        nil
+          treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+          treemacs-recenter-distance             0.1
+          treemacs-recenter-after-file-follow    nil
+          treemacs-recenter-after-tag-follow     nil
+          treemacs-recenter-after-project-jump   'always
+          treemacs-recenter-after-project-expand 'on-distance
+          treemacs-show-cursor                   nil
+          treemacs-show-hidden-files             t
+          treemacs-silent-filewatch              nil
+          treemacs-silent-refresh                nil
+          treemacs-sorting                       'alphabetic-desc
+          treemacs-space-between-root-nodes      t
+          treemacs-tag-follow-cleanup            t
+          treemacs-tag-follow-delay              1.5
+          treemacs-width                         35)
+
+    ;; The default width and height of the icons is 22 pixels. If you are
+    ;; using a Hi-DPI display, uncomment this to double the icon size.
+    ;;(treemacs-resize-icons 44)
+
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode t)
+    (pcase (cons (not (null (executable-find "git")))
+                 (not (null (executable-find "python3"))))
+      (`(t . t)
+       (treemacs-git-mode 'deferred))
+      (`(t . _)
+       (treemacs-git-mode 'simple))))
+  :bind
+  (:map global-map
+        ("s-1"       . treemacs) ; 表示/非表示の toggle
+        ("M-0"       . treemacs-select-window) ; treemacs window へ直接移動するショートカットキー
+        ("C-x t 1"   . treemacs-delete-other-windows)
+        ("C-x t B"   . treemacs-bookmark)
+        ("C-x t C-t" . treemacs-find-file)
+        ("C-x t M-t" . treemacs-find-tag)))
+
+(use-package treemacs-evil
+  :after treemacs)
+
+(use-package treemacs-projectile
+  :after treemacs projectile)
+
+(use-package treemacs-icons-dired
+  :after treemacs dired
+  :config (treemacs-icons-dired-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Git-related things.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;(use-package magit
+;  :ensure t
+;  :commands (magit-status magit-checkout)
+;  :bind (("C-x g" . magit-status)
+;         ("C-c g b" . magit-checkout)
+;         ("C-c g B" . magit-blame))
+;  :init
+;  (use-package magit-gh-pulls
+;    :ensure t
+;    :config
+;    (add-hook 'magit-mode-hook 'magit-gh-pulls-mode))
+;  (setq magit-revert-buffers 'silent
+;        magit-push-always-verify nil
+;        git-commit-summary-max-length 70)
+;  ;; Use flyspell in the commit buffer
+;  (add-hook 'git-commit-setup-hook 'git-commit-turn-on-flyspell)
+;  (add-hook 'magit-blame-mode 'evil-insert-state)
+;  (add-hook 'magit-blame-mode (lambda () (message "hello"))))
+
+(use-package git-gutter+
+  :diminish git-gutter+-mode
+  :config
+  (progn
+    (global-git-gutter+-mode)
+    (use-package git-gutter-fringe+ :defer t)
+    (define-key evil-normal-state-map "[h" 'git-gutter+-previous-hunk)
+    (define-key evil-normal-state-map "]h" 'git-gutter+-next-hunk)
+    (evil-leader/set-key "g +" 'git-gutter+-stage-hunks)))
+
+(use-package git-messenger
+  ;; :ensure t
+  :commands git-messenger:popup-message
+  :init
+  (setq git-messenger:show-detail t)
+  (evil-leader/set-key "g p" 'git-messenger:popup-message)
+  :config
+  (progn
+    (define-key git-messenger-map (kbd "j") 'git-messenger:popup-close)
+    (define-key git-messenger-map (kbd "k") 'git-messenger:popup-close)
+    (define-key git-messenger-map (kbd "RET") 'git-messenger:popup-close)))
+
+(use-package git-timemachine
+  ;; :ensure t
+  :commands git-timemachine-toggle
+  :init
+  (evil-leader/set-key "g t" 'git-timemachine-toggle)
+  :config
+  (progn
+    (evil-make-overriding-map git-timemachine-mode-map 'normal)
+    ;; force update evil keymaps after git-timemachine-mode loaded
+    (add-hook 'git-timemachine-mode-hook #'evil-normalize-keymaps)))
+
+(use-package gitignore-mode :defer t)
+
+;; 指定した行を`github'で開く
+(use-package browse-at-remote
+  :commands browse-at-remote/browse
+  :init
+  (evil-leader/set-key "g b" 'browse-at-remote/browse))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Ivy-related things.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package ivy
+  :diminish ivy-mode
+  :bind (("C-S-a" . counsel-M-x)
+         ("C-S-o" . counsel-find-file))
+  :config
+  (ivy-mode 1))
+
+(use-package projectile
+  ;; :ensure t
+  :commands (projectile-find-file projectile-switch-project)
+  :diminish projectile-mode
+  :init
+  (use-package helm-projectile :defer t)
+  (evil-leader/set-key
+    "p" 'helm-projectile-switch-project
+    "f" 'helm-projectile-find-file
+    "T" 'my/projectile-open-todo)
+  :config
+  (projectile-global-mode)
+  (when (executable-find "gtags")
+    ;; gtags の再生成コマンド
+    (setq projectile-tags-file-name "GTAGS")
+    (setq projectile-tags-command "gtags --gtagslabel=pygments")
+    (defun regenerate-tags ()
+      (interactive)
+      (let ((tags-directory (directory-file-name (projectile-project-root))))
+        (async-shell-command
+         (format "gtags --gtagslabel=pygments --debug" tags-file-name tags-directory))))
+    ))
+
+(use-package flyspell
+  ;; built-in
+  :init
+  (setq ispell-program-name "aspell"))
+
+(use-package company
+  :defer 4
+  :diminish company-mode
+  :config
+  (progn
+    (setq company-idle-delay 0.1
+          company-minimum-prefix-length 2
+          company-show-numbers t
+          company-dabbrev-downcase nil
+          company-dabbrev-ignore-case t)
+    (global-set-key (kbd "C-<tab>") 'company-manual-begin)
+    (define-key company-active-map (kbd "C-n") 'company-select-next)
+    (define-key company-active-map (kbd "C-p") 'company-select-previous)
+    (define-key company-active-map (kbd "TAB") 'company-complete-selection)
+    (define-key company-active-map (kbd "<tab>") 'company-complete-selection)
+    (define-key company-active-map (kbd "RET") 'company-complete-selection)
+    (global-company-mode t)))
+
+(use-package hl-todo
+  ;; :ensure t
+  :defer 1
+  :config
+  (global-hl-todo-mode))
+
+(use-package web-mode
+  ;; :ensure t
+  :mode (("\\.html\\.erb\\'" . web-mode))
+  :config
+  (setq web-mode-markup-indent-offset 2
+        web-mode-css-indent-offset 2
+        web-mode-code-indent-offset 2))
+
+(use-package yaml-mode
+  :defer t
+  :mode "\\.e?ya?ml$")
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;(use-package evil
 ;  :ensure t
@@ -291,33 +527,7 @@
 ;    (evil-define-key 'visual evil-surround-mode-map "s" 'evil-surround-region)))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; My stuff.
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package my-gui
-  :straight nil
-  :if (display-graphic-p))
-
-(use-package my-osx
-  :straight nil
-  :if (eq system-type 'darwin))
-
-(use-package my-windows
-  :straight nil
-  :if (eq system-type 'windows-nt))
-
-;; (use-package my-scratch-buffer
-;;   :straight nil
-;;   :commands my/scratch-buffer-create-or-prompt
-;;   :init
-;;   (evil-leader/set-key "S" 'my/scratch-buffer-create-or-prompt))
-
-;; (use-package my-smarter-beginning-of-line
-;;   :straight nil
-;;   :bind ("C-a" . my/smarter-beginning-of-line))
-
 ;; Built-in packages.
-
 ;(use-package savehist
 ;  :init
 ;  (setq savehist-file "~/.emacs.d/etc/savehist")
@@ -329,259 +539,38 @@
 ;  :config
 ;  (define-key dired-mode-map (kbd "-") 'dired-up-directory))
 
-;; Misc packages.
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; NeoTree
-;; https://github.com/andrewmcveigh/emacs.d/blob/master/lisp/init-neotree.el
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; (defun neotree-copy-file ()
-;;   (interactive)
-;;   (let* ((current-path (neo-buffer--get-filename-current-line))
-;;          (msg (format "Copy [%s] to: "
-;;                       (neo-path--file-short-name current-path)))
-;;          (to-path (read-file-name msg (file-name-directory current-path))))
-;;     (dired-copy-file current-path to-path t))
-;;   (neo-buffer--refresh t))
-
-;; (use-package neotree
-;;   ;; :ensure t
-;;   :config
-;;   (evil-leader/set-key "n" 'neotree-toggle)
-;;   (evil-leader/set-key "m" 'neotree-projectile-action)
-;;   ;; 隠しファイルをデフォルトで表示
-;;   (setq neo-show-hidden-files t)
-;;   ;; neotree でファイルを新規作成した後、自動的にファイルを開く
-;;   (setq neo-create-file-auto-open t)
-;;   ;; delete-other-window で neotree ウィンドウを消さない
-;;   (setq neo-persist-show t)
-;;   ;; neotree ウィンドウを表示する毎に current file のあるディレクトリを表示する
-;;   (setq neo-smart-open t)
-;;   (define-minor-mode neotree-evil
-;;     "Use NERDTree bindings on neotree."
-;;     :lighter " NT"
-;;     :keymap (progn
-;;               (evil-make-overriding-map neotree-mode-map 'normal t)
-;;               (evil-define-key 'normal neotree-mode-map
-;;                 "C" 'neotree-change-root
-;;                 "U" 'neotree-select-up-node
-;;                 "r" 'neotree-refresh
-;;                 "o" 'neotree-enter
-;;                 (kbd "<return>") 'neotree-enter
-;;                 "i" 'neotree-enter-horizontal-split
-;;                 "s" 'neotree-enter-vertical-split
-;;                 "n" 'evil-search-next
-;;                 "N" 'evil-search-previous
-;;                 "ma" 'neotree-create-node
-;;                 "mc" 'neotree-copy-file
-;;                 "md" 'neotree-delete-node
-;;                 "mm" 'neotree-rename-node
-;;                 "gg" 'evil-goto-first-line
-;;                 "gi" (lambda ()
-;;                        (interactive)
-;;                        (if (string= pe/get-directory-tree-external-command
-;;                                     nt/gitignore-files-cmd)
-;;                            (progn (setq pe/get-directory-tree-external-command
-;;                                         nt/all-files-cmd))
-;;                          (progn (setq pe/get-directory-tree-external-command
-;;                                       nt/gitignore-files-cmd)))
-;;                        (nt/refresh))
-;;                 "I" (lambda ()
-;;                       (interactive)
-;;                       (if pe/omit-enabled
-;;                           (progn (setq pe/directory-tree-function
-;;                                        'pe/get-directory-tree-async)
-;;                                  (pe/toggle-omit nil))
-;;                         (progn (setq pe/directory-tree-function
-;;                                      'pe/get-directory-tree-external)
-;;                                (pe/toggle-omit t)))))
-;;               neotree-mode-map))
-;;   (setq neo-hidden-files-regexp "^\\.\\|~$\\|^#.*#$\\|^target$\\|^pom\\.*"))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Treemacs
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package treemacs
-  :defer t
-  :init
-  (with-eval-after-load 'winum
-    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
-  :config
-  (progn
-    (setq treemacs-collapse-dirs                 (if (executable-find "python") 3 0)
-          treemacs-deferred-git-apply-delay      0.5
-          treemacs-display-in-side-window        t
-          treemacs-eldoc-display                 t
-          treemacs-file-event-delay              5000
-          treemacs-file-follow-delay             0.2
-          treemacs-follow-after-init             t
-          treemacs-git-command-pipe              ""
-          treemacs-goto-tag-strategy             'refetch-index
-          treemacs-indentation                   2
-          treemacs-indentation-string            " "
-          treemacs-is-never-other-window         nil
-          treemacs-max-git-entries               5000
-          treemacs-no-png-images                 nil
-          treemacs-no-delete-other-windows       t
-          treemacs-project-follow-cleanup        nil
-          treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
-          treemacs-recenter-distance             0.1
-          treemacs-recenter-after-file-follow    nil
-          treemacs-recenter-after-tag-follow     nil
-          treemacs-recenter-after-project-jump   'always
-          treemacs-recenter-after-project-expand 'on-distance
-          treemacs-show-cursor                   nil
-          treemacs-show-hidden-files             t
-          treemacs-silent-filewatch              nil
-          treemacs-silent-refresh                nil
-          treemacs-sorting                       'alphabetic-desc
-          treemacs-space-between-root-nodes      t
-          treemacs-tag-follow-cleanup            t
-          treemacs-tag-follow-delay              1.5
-          treemacs-width                         35)
-
-    ;; The default width and height of the icons is 22 pixels. If you are
-    ;; using a Hi-DPI display, uncomment this to double the icon size.
-    ;;(treemacs-resize-icons 44)
-
-    (treemacs-follow-mode t)
-    (treemacs-filewatch-mode t)
-    (treemacs-fringe-indicator-mode t)
-    (pcase (cons (not (null (executable-find "git")))
-                 (not (null (executable-find "python3"))))
-      (`(t . t)
-       (treemacs-git-mode 'deferred))
-      (`(t . _)
-       (treemacs-git-mode 'simple))))
-  :bind
-  (:map global-map
-        ("M-0"       . treemacs-select-window)
-        ("C-x t 1"   . treemacs-delete-other-windows)
-        ("C-x t t"   . treemacs)
-        ("C-x t B"   . treemacs-bookmark)
-        ("C-x t C-t" . treemacs-find-file)
-        ("C-x t M-t" . treemacs-find-tag)))
-
-(use-package treemacs-evil
-  :after treemacs)
-
-(use-package treemacs-projectile
-  :after treemacs projectile)
-
-(use-package treemacs-icons-dired
-  :after treemacs dired
-  :config (treemacs-icons-dired-mode))
-
-;; (use-package zlc
-;;   ;; :ensure t
-;;   :defer t
-;;   :config
-;;   (zlc-mode t)
-;;   (let ((map minibuffer-local-map))
-;;     ;; like menu select
-;;     (define-key map (kbd "C-n") 'zlc-select-next-vertical)
-;;     (define-key map (kbd "C-p") 'zlc-select-previous-vertical)
-;;     (define-key map (kbd "C-f") 'zlc-select-next)
-;;     (define-key map (kbd "C-b") 'zlc-select-previous)
-;;     ;; reset selection
-;;     (define-key map (kbd "C-c") 'zlc-reset)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Git-related things.
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;(use-package magit
-;  :ensure t
-;  :commands (magit-status magit-checkout)
-;  :bind (("C-x g" . magit-status)
-;         ("C-c g b" . magit-checkout)
-;         ("C-c g B" . magit-blame))
-;  :init
-;  (use-package magit-gh-pulls
-;    :ensure t
-;    :config
-;    (add-hook 'magit-mode-hook 'magit-gh-pulls-mode))
-;  (setq magit-revert-buffers 'silent
-;        magit-push-always-verify nil
-;        git-commit-summary-max-length 70)
-;  ;; Use flyspell in the commit buffer
-;  (add-hook 'git-commit-setup-hook 'git-commit-turn-on-flyspell)
-;  (add-hook 'magit-blame-mode 'evil-insert-state)
-;  (add-hook 'magit-blame-mode (lambda () (message "hello"))))
-
-(use-package git-gutter+
-  :diminish git-gutter+-mode
-  :config
-  (progn
-    (global-git-gutter+-mode)
-    (use-package git-gutter-fringe+ :defer t)
-    (define-key evil-normal-state-map "[h" 'git-gutter+-previous-hunk)
-    (define-key evil-normal-state-map "]h" 'git-gutter+-next-hunk)
-    (evil-leader/set-key "g +" 'git-gutter+-stage-hunks)))
-
-(use-package git-messenger
-  ;; :ensure t
-  :commands git-messenger:popup-message
-  :init
-  (setq git-messenger:show-detail t)
-  (evil-leader/set-key "g p" 'git-messenger:popup-message)
-  :config
-  (progn
-    (define-key git-messenger-map (kbd "j") 'git-messenger:popup-close)
-    (define-key git-messenger-map (kbd "k") 'git-messenger:popup-close)
-    (define-key git-messenger-map (kbd "RET") 'git-messenger:popup-close)))
-
-(use-package git-timemachine
-  ;; :ensure t
-  :commands git-timemachine-toggle
-  :init
-  (evil-leader/set-key "g t" 'git-timemachine-toggle)
-  :config
-  (progn
-    (evil-make-overriding-map git-timemachine-mode-map 'normal)
-    ;; force update evil keymaps after git-timemachine-mode loaded
-    (add-hook 'git-timemachine-mode-hook #'evil-normalize-keymaps)))
-
-(use-package gitignore-mode :defer t)
-
-;; 指定した行を`github'で開く
-(use-package browse-at-remote
-  :commands browse-at-remote/browse
-  :init
-  (evil-leader/set-key "g b" 'browse-at-remote/browse))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Helm-related things.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package helm
-  ;; :ensure t
-  :diminish helm-mode
-  :bind (("C-S-a" . helm-M-x)
-         ("C-S-n" . helm-find-files)
-         ("C-x b" . helm-buffers-list))
-  :init
-  (setq helm-M-x-fuzzy-match t
-        helm-buffers-fuzzy-matching t
-        helm-display-header-line nil)
-  :config
-  ;; No idea why here find-file is set to nil (so it uses the native find-file
-  ;; for Emacs. This makes stuff like (find-file (read-file-name ...)) work with
-  ;; Helm again.
-  (helm-mode 1)
-  (helm-autoresize-mode 1)
-  (add-to-list 'helm-completing-read-handlers-alist '(find-file . nil)))
+;; (use-package helm
+;;   :diminish helm-mode
+;;   :bind (("C-S-a" . helm-M-x)
+;;          ("C-S-n" . helm-find-files)
+;;          ("C-x b" . helm-buffers-list))
+;;   :init
+;;   (setq helm-M-x-fuzzy-match t
+;;         helm-buffers-fuzzy-matching t
+;;         helm-display-header-line nil)
+;;   :config
+;;   ;; No idea why here find-file is set to nil (so it uses the native find-file
+;;   ;; for Emacs. This makes stuff like (find-file (read-file-name ...)) work with
+;;   ;; Helm again.
+;;   (helm-mode 1)
+;;   (helm-autoresize-mode 1)
+;;   (add-to-list 'helm-completing-read-handlers-alist '(find-file . nil)))
 
-(use-package helm-ag
-  ;; :ensure t
-  :commands (helm-do-ag helm-do-ag-project-root)
-  :init
-  (evil-leader/set-key
-    "a g" 'helm-do-ag-project-root
-    "a G" 'helm-do-ag)
-  :config
-  (progn
-    (evil-make-overriding-map helm-ag-mode-map 'normal)
-    (add-hook 'helm-ag-mode-hook #'evil-normalize-keymaps)))
+;; (use-package helm-ag
+;;   ;; :ensure t
+;;   :commands (helm-do-ag helm-do-ag-project-root)
+;;   :init
+;;   (evil-leader/set-key
+;;     "a g" 'helm-do-ag-project-root
+;;     "a G" 'helm-do-ag)
+;;   :config
+;;   (progn
+;;     (evil-make-overriding-map helm-ag-mode-map 'normal)
+;;     (add-hook 'helm-ag-mode-hook #'evil-normalize-keymaps)))
 
 ;(use-package ggtags
 ;  :init
@@ -613,34 +602,6 @@
 ;  (define-key ggtags-mode-map (kbd "C-c g m") 'ggtags-find-tag-dwim)
 ;  (define-key ggtags-mode-map (kbd "M-,") 'pop-tag-mark))
 
-(use-package projectile
-  ;; :ensure t
-  :commands (projectile-find-file projectile-switch-project)
-  :diminish projectile-mode
-  :init
-  (use-package helm-projectile :defer t)
-  (evil-leader/set-key
-    "p" 'helm-projectile-switch-project
-    "f" 'helm-projectile-find-file
-    "T" 'my/projectile-open-todo)
-  :config
-  (projectile-global-mode)
-  (when (executable-find "gtags")
-    ;; gtags の再生成コマンド
-    (setq projectile-tags-file-name "GTAGS")
-    (setq projectile-tags-command "gtags --gtagslabel=pygments")
-    (defun regenerate-tags ()
-      (interactive)
-      (let ((tags-directory (directory-file-name (projectile-project-root))))
-        (async-shell-command
-         (format "gtags --gtagslabel=pygments --debug" tags-file-name tags-directory))))
-    ))
-
-(use-package flyspell
-  ;; built-in
-  :init
-  (setq ispell-program-name "aspell"))
-
 ;(use-package popwin
 ;  :ensure t
 ;  :defer 2
@@ -658,24 +619,6 @@
 ;              ("*GHC Info*" :position bottom :stick t :noselect t)))
 ;    (global-set-key (kbd "C-l") popwin:keymap)
 ;    (popwin-mode 1)))
-
-(use-package company
-  :defer 4
-  :diminish company-mode
-  :config
-  (progn
-    (setq company-idle-delay 0.1
-          company-minimum-prefix-length 2
-          company-show-numbers t
-          company-dabbrev-downcase nil
-          company-dabbrev-ignore-case t)
-    (global-set-key (kbd "C-<tab>") 'company-manual-begin)
-    (define-key company-active-map (kbd "C-n") 'company-select-next)
-    (define-key company-active-map (kbd "C-p") 'company-select-previous)
-    (define-key company-active-map (kbd "TAB") 'company-complete-selection)
-    (define-key company-active-map (kbd "<tab>") 'company-complete-selection)
-    (define-key company-active-map (kbd "RET") 'company-complete-selection)
-    (global-company-mode t)))
 
 ;(use-package yasnippet
 ;  :ensure t
@@ -734,12 +677,6 @@
 ;  :config
 ;  (beacon-mode 1))
 
-(use-package hl-todo
-  ;; :ensure t
-  :defer 1
-  :config
-  (global-hl-todo-mode))
-
 ;(use-package perspective
 ;  :ensure t
 ;  :init
@@ -756,13 +693,6 @@
 
 ;; Modes for programming languages and such.
 
-(use-package web-mode
-  ;; :ensure t
-  :mode (("\\.html\\.erb\\'" . web-mode))
-  :config
-  (setq web-mode-markup-indent-offset 2
-        web-mode-css-indent-offset 2
-        web-mode-code-indent-offset 2))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Erlang / Elixir
@@ -863,11 +793,6 @@
 ;  :ensure t
 ;  :diminish clj-refactor-mode
 ;  :config (cljr-add-keybindings-with-prefix "C-c j"))
-
-(use-package yaml-mode
-  ;; :ensure t
-  :defer t
-  :mode "\\.e?ya?ml$")
 
 ;; ;;; Buffer, Windows and Frames
 ;; (setq frame-title-format
