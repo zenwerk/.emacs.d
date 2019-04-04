@@ -5,7 +5,7 @@
   (evil-mode 1)
   ;; Modes that don't use evil.
   (setq evil-emacs-state-modes (append evil-emacs-state-modes
-                                       '(alchemist-iex-mode)))
+                                       '(eshell-mode)))
   ;; j,k で物理行移動, gj,gk で論理行移動
   (defun evil-swap-key (map key1 key2)
     "MAP中のKEY1とKEY2を入れ替え"

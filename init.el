@@ -237,6 +237,11 @@
   :defer t
   :mode "\\.e?ya?ml$")
 
+(use-package awesome-tab
+  :straight nil
+  :config
+  (awesome-tab-mode t))
+
 ;; Built-in packages.
 ;(use-package savehist
 ;  :init
@@ -305,16 +310,6 @@
 ;  (progn
 ;    (setq-default yas-snippet-dirs '("~/.emacs.d/snippets"))
 ;    (yas-global-mode t)))
-
-;(use-package writeroom-mode
-;  :ensure t
-;  :commands writeroom-mode
-;  :init
-;  (evil-leader/set-key "m w" 'writeroom-mode)
-;  :config
-;  (setq writeroom-restore-window-config t
-;        writeroom-width 100)
-;  (add-to-list 'writeroom-global-effects 'my/toggle-tmux-status-bar))
 
 ;; Correctly load $PATH and $MANPATH on OSX (GUI).
 ;(use-package reveal-in-osx-finder
