@@ -240,6 +240,8 @@
 (use-package awesome-tab
   :straight nil
   :config
+  (global-set-key (kbd "C-<tab>") 'awesome-tab-forward)
+  (global-set-key (kbd "C-S-<tab>") 'awesome-tab-backward)
   (awesome-tab-mode t))
 
 ;; Built-in packages.
