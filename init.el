@@ -170,6 +170,69 @@
   :emacs>= 24.1
   :ensure t)
 
+(leaf evil
+  :ensure t
+  :require t
+  :preface
+  (defun evil-swap-key (map key1 key2)
+    "MAP中のKEY1とKEY2を入れ替え"
+    (let ((def1 (lookup-key map key1))
+          (def2 (lookup-key map key2)))
+      (define-key map key1 def2)
+      (define-key map key2 def1)))
+
+  :config
+  (evil-mode 1)
+  (setq evil-emacs-state-modes (append evil-emacs-state-modes
+                                       '(eshell-mode)))
+  (evil-swap-key evil-motion-state-map "j" "gj")
+  (evil-swap-key evil-motion-state-map "k" "gk")
+
+  (leaf evil-leader
+    :ensure t
+    :require t
+    :setq ((evil-leader/in-all-status . 1))
+    :config
+    (global-evil-leader-mode)
+    (evil-leader/set-leader "\\"))
+
+  (leaf evil-visualstar
+    :ensure t
+    :require t
+    :config
+    (global-evil-visualstar-mode 1))
+
+  (leaf evil-surround
+    :ensure t
+    :require t
+    :config
+    (global-evil-surround-mode 1))
+
+  (leaf evil-matchit
+    :ensure t
+    :require t
+    :config
+    (global-evil-matchit-mode 1))
+
+  (leaf evil-nerd-commenter
+    :ensure t
+    :require t
+    :bind (("s-/" . evilnc-comment-or-uncomment-lines)
+           ("C-c l" . evilnc-quick-comment-or-uncomment-to-the-line)
+           ("C-c c" . evilnc-copy-and-comment-lines)
+           ("C-c p" . evilnc-comment-or-uncomment-paragraphs))
+    :config
+    (evil-leader/set-key "c<SPC>" 'evilnc-comment-or-uncomment-lines "cl" 'evilnc-quick-comment-or-uncomment-to-the-line "ll" 'evilnc-quick-comment-or-uncomment-to-the-line "cc" 'evilnc-copy-and-comment-lines "cp" 'evilnc-comment-or-uncomment-paragraphs "cr" 'comment-or-uncomment-region "cv" 'evilnc-toggle-invert-comment-line-by-line))
+
+  (leaf evil-search-highlight-persist
+    :ensure t
+    :require t
+    :bind ((evil-normal-state-map
+            ([escape]
+             . evil-search-highlight-persist-remove-all)))
+    :config
+    (global-evil-search-highlight-persist t)))
+
 (setq ring-bell-function 'ignore)
 
 (provide 'init)
